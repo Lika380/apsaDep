@@ -1673,11 +1673,11 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, 'src/dist')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // Любой другой API-роут должен быть выше этого catch-all
 
 // SPA fallback — для всех "чужих" маршрутов отдаём index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/src/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
