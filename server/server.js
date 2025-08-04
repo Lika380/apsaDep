@@ -1651,27 +1651,32 @@ process.on('SIGINT', () => {
 });
 
 // 📌 Импорт для работы с путями
+// ✅ Импорт для работы с путями
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// 📌 Отдаём статику фронта (после сборки он окажется в client/dist)
+// ✅ Раздаём статические файлы React
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// 📌 SPA fallback — всегда отдаём index.html, если роут не API
+// ✅ SPA fallback — всегда отдаём index.html, если запрос не к API
 app.get('*', (req, res) => {
+  // Если это API-запрос, не трогаем
+  if (req.originalUrl.startsWith('/api')) {
+    return res.status(404).json({ message: 'API route not found' });
+  }
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
 
-// 📌 Запускаем сервер
+// ✅ Запускаем сервер
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// 📌 Обработка ошибок сервера
+// ✅ Обработка ошибок сервера
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
     console.error(`❌ Порт ${PORT} уже используется. Возможно, сервер уже запущен.`);
