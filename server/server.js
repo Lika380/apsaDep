@@ -1664,16 +1664,17 @@ server.on('error', (err) => {
 });
 
 
-
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, '../client/dist'))); // путь к собранному фронту
+app.use(express.static(path.join(__dirname, 'src/dist')));
 
-// Отдавать index.html на все остальные маршруты (для SPA)
+// Любой другой API-роут должен быть выше этого catch-all
+
+// SPA fallback — для всех "чужих" маршрутов отдаём index.html
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+  res.sendFile(path.join(__dirname, '../client/src/dist/index.html'));
 });
