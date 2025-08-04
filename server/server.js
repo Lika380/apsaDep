@@ -1671,10 +1671,9 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Раздаём собранный фронтенд
-app.use(express.static(path.join(__dirname, 'client', 'dist')));
+app.use(express.static(path.join(__dirname, '../client/dist'))); // путь к собранному фронту
 
-// Для всех маршрутов, кроме API, отдаём index.html
+// Отдавать index.html на все остальные маршруты (для SPA)
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
 });
