@@ -1651,10 +1651,8 @@ process.on('SIGINT', () => {
 
 
 const PORT = process.env.PORT || 3001;
+app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 
-const server = app.listen(PORT, () => {
-  console.log(`Сервер запущен на порту ${PORT}`);
-});
 
 
 server.on('error', (err) => {

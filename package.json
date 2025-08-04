@@ -1,5 +1,8 @@
 {
   "type": "module",
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "firebase": "^11.10.0",
     "react-router-dom": "^7.6.3",
