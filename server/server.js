@@ -7,16 +7,27 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
-const JWT_SECRET = 'your-secret-key-change-in-production';
 app.use(cors({
   origin: "https://apsadepserver.onrender.com", // Разрешаем только твой фронтенд
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // добавили OPTIONS
+  allowedHeaders: ["Content-Type", "Authorization"], // важно для POST с JSON
   credentials: true
 }));
+
+
+app.options('*', cors());
 app.use(express.json());
 const router = express.Router();
 import nodemailer from 'nodemailer';
 
+router.post("/register", (req, res) => {
+  res.json({ message: "Регистрация прошла" });
+});
+app.use(router);
+
+
+app.listen(3000, () => console.log("Server running"));
+// Обработка preflight-запросов
 
 
 function formatDateForSQLite(date) {
