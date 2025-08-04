@@ -1,16 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const sqlite3 = require('sqlite3').verbose();
-const { v4: uuidv4 } = require('uuid');
+import express from 'express';
+import cors from 'cors';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import sqlite3 from 'sqlite3';
+import { v4 as uuidv4 } from 'uuid';
+import dotenv from 'dotenv';
+dotenv.config(); 
 const app = express();
 const JWT_SECRET = 'your-secret-key-change-in-production';
 app.use(cors());
 app.use(express.json());
 const router = express.Router();
-require("dotenv").config();
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
 
 
 
