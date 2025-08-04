@@ -7,13 +7,23 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
+
+const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "https://apsadep.onrender.com";
 app.use(cors({
-  origin: "https://apsadep.onrender.com", // Разрешаем только твой фронтенд
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // добавили OPTIONS
-  allowedHeaders: ["Content-Type", "Authorization"], // важно для POST с JSON
+  origin: FRONTEND_ORIGIN,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
 }));
 
+
+
+
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET) {
+  console.error("JWT_SECRET не задан в .env");
+  process.exit(1);
+}
 
 app.options('*', cors());
 app.use(express.json());
@@ -25,6 +35,10 @@ router.post("/register", (req, res) => {
 });
 app.use(router);
 
+
+app.post("/login", (req, res) => {
+  res.json({ message: "Login OK" });
+});
 
 app.listen(3000, () => console.log("Server running"));
 // Обработка preflight-запросов
