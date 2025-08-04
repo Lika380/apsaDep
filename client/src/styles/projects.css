@@ -1,0 +1,63 @@
+
+
+/* Если используешь контейнер в Projects */
+.projects {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    flex-direction: column;
+    padding-bottom: 10%;
+    padding-top: 10%;
+  }
+
+.projects-content {
+    width: 90%;
+    margin: 0 auto;
+    padding-bottom: 70px; /* отступ от футера */
+    flex: 1; /* важно! чтобы растянуть .projects-content */
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 2%;
+
+
+}
+
+.projects-content h2 {
+    margin-bottom: 2%;
+    font-weight: 600;
+    font-size: 30px;
+    color: var(--secondary-color);
+}
+.projects-content h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+
+
+@media (max-width: 1500px) {
+
+}
+
+
+@media (max-width: 768px) {
+
+}
+
+
+@media (max-width: 660px) {
+
+
+}
+
+@media (max-width: 480px) {
+
+}
+
+@media (max-width: 420px) {
+
+}

@@ -1,0 +1,10 @@
+.catalog-page {
+    display: flex;
+}
+
+.catalog-list {
+    display: flex;
+    width: 40%;
+    background: rgb(243, 243, 243);
+    height: 100%;
+}

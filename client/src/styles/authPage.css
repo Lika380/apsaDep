@@ -1,0 +1,33 @@
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 5000; /* выше, чем mobileMenu (2100) и header (2000) */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    display: flex !important;
+    visibility: visible !important;
+  }
+  
+  .modal-content {
+    background: #fff;
+    border-radius: 14px;
+    padding: 24px;
+    max-width: 420px;
+    width: 90%;
+    position: relative;
+    z-index: 5100;
+    box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+  }
+  
+  @media (max-width: 768px) {
+    .modal-overlay {
+        z-index: 10000;
+        display: flex !important;
+        visibility: visible !important;
+      }
+  }
+
+  

@@ -1,0 +1,585 @@
+.apsuastore-home-container {
+    width: 100%;
+    height: 100vh;
+    position: relative;
+    color: rgb(0, 0, 0);
+    font-family: 'Cridea', sans-serif;
+  }
+  
+  /* Background image and overlay */
+  .apsuastore-home-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://i.postimg.cc/Vkd2dxBn/Frame-1502.png');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+  }
+  
+/* Location Section */
+.apsuastore-location-section {
+    width: 100%;
+  margin-top: 150px;
+
+
+  }
+  
+  .apsuastore-location-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-top: 60px;
+  }
+  
+  .apsuastore-location-heading {
+    text-align: center;
+    margin-bottom: 60px;
+  }
+  
+  .apsuastore-location-title {
+    font-size: 36px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 15px;
+  }
+  
+  .apsuastore-location-subtitle {
+    font-size: 18px;
+    color: #666;
+    max-width: 700px;
+    margin: 0 auto;
+  }
+  
+  .apsuastore-location-content {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 60px;
+  }
+  
+  /* Map Container */
+  .apsuastore-location-map-container {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+  
+  .apsuastore-map-placeholder {
+    position: relative;
+    width: 100%;
+    height: 340px;
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  
+  .apsuastore-map-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  
+  .apsuastore-map-pin {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 2;
+  }
+  
+  .apsuastore-map-pin-icon {
+    font-size: 40px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .apsuastore-map-pin-pulse {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background-color: rgba(46, 125, 50, 0.4);
+    border-radius: 50%;
+    top: 15px;
+    animation: pulse 1.5s infinite;
+  }
+  
+
+
+
+@keyframes pulse {
+    0% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(5);
+      opacity: 0;
+    }
+  }
+  
+  /* Address Card */
+  .apsuastore-location-address {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .apsuastore-address-card {
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+  
+  .apsuastore-address-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  
+  .apsuastore-address-icon {
+    width: 3%;
+    margin-right: 10px;
+    color: #000000;
+  }
+  
+  .apsuastore-address-title {
+    font-size: 18px;
+    font-weight: 500;
+    color: #333;
+    margin: 0;
+  }
+  
+  .apsuastore-address-text {
+    font-size: 16px;
+    color: #000000;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  
+  .apsuastore-address-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .apsuastore-address-copy,
+  .apsuastore-address-directions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #444;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+  }
+  
+  .apsuastore-address-copy:hover,
+  .apsuastore-address-directions:hover {
+    border-color: #000000;
+    color: #000000;
+  }
+  
+  .apsuastore-copy-success {
+    font-size: 14px;
+    color: #000000;
+    animation: fadeOut 2s forwards;
+  }
+  
+  @keyframes fadeOut {
+    0% { opacity: 1; }
+    70% { opacity: 1; }
+    100% { opacity: 0; }
+  }
+  
+  .apsuastore-copy-icon,
+  .apsuastore-directions-icon {
+    width: 10%;
+
+  }
+
+.apsuastore-contact-info h2 {
+  font-size: 35px;
+  font-weight: 600;
+  margin-top: 6%;
+  color: #4a564c;
+}
+
+.apsuastore-contact-info {
+  width: 80%;
+  display: flex;
+  justify-content: space-between;
+  margin: 0 auto;
+  color: #4a564c;
+  margin-bottom: 10%;
+}
+
+.apsamarket-contact-block {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0 auto;
+}
+
+  
+
+/* Contact Info */
+.apsuastore-contact-info {
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    color: #4a564c;
+    font-size: 20px;
+  }
+  
+  .apsuastore-contact-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+    font-size: 20px;
+  }
+  
+  .apsuastore-contact-icon {
+    width: 4%;
+  }
+  
+  .apsuastore-contact-text {
+    font-size: 16px;
+    color: #4a564c;
+    margin: 0;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .content-hr {
+    border: 0.5px solid rgb(201, 208, 203);
+    width: 100%;
+    height: 1px;
+} 
+
+  
+  .contact-map {
+    height: 340px; /* или любое нужное значение */
+    width: 100%;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  
+/* Форма обратной связи */
+.contact-form-section {
+    padding: 60px 0;
+    background-color: rgb(245, 245, 245);
+  }
+  
+  .contact-form {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    max-width: 1200px;
+    width: 800px;
+    margin: 0 auto;
+  }
+  
+  .contact-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+  }
+  
+  .contact-form-group {
+    margin-bottom: 5px;
+  }
+  
+  .contact-form-full {
+    grid-column: span 2;
+  }
+  
+  .contact-form-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #4a564c;
+    margin-bottom: 8px;
+  }
+  
+  .contact-form-input,
+  .contact-form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #f9f9f9;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  :focus,
+  .contact-form-textarea:focus {
+    outline: none;
+  
+  }
+  .contact-section-title {
+    display: flex;
+    justify-content: center;
+    color: #4a564c;
+    margin-bottom: 2%;
+    font-size: 16px;
+  }
+  
+  .contact-form-textarea {
+    resize: vertical;
+    min-height: 120px;
+  }
+  
+  .contact-form-submit {
+    margin-top: 30px;
+    text-align: center;
+  }
+  
+  .contact-form-button {
+    background: #969c93;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 14px 35px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .contact-form-button:hover {
+    background-color: var(--secondary-color);
+    transform: translateY(-3px);
+  }
+  
+  /* Успешная отправка формы */
+  .contact-form-success {
+    background-color: white;
+    padding: 40px;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px var(--secondary-color);
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  
+  .contact-success-icon {
+    width: 60px;
+    height: 60px;
+    background-color: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8rem;
+    border-radius: 50%;
+    margin: 0 auto 20px;
+  }
+  
+  .contact-success-title {
+    font-size: 1.5rem;
+    color: var(--secondary-color);
+    margin: 0 0 15px;
+  }
+  
+  .contact-success-text {
+    font-size: 1rem;
+    color: var(--secondary-color);
+    margin: 0;
+  }
+  
+  /* Как добраться */
+  .contact-directions-section {
+    padding: 60px 0;
+    background-color: #6c6c6c;
+  }
+  
+  .contact-directions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+  }
+  
+  .contact-directions-card {
+    background-color: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  }
+  
+  .contact-directions-icon {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #000000;
+    display: inline-block;
+    background-color: rgba(104, 104, 104, 0.1);
+    width: 60px;
+    height: 60px;
+    line-height: 60px;
+    text-align: center;
+    border-radius: 50%;
+  }
+  
+  .contact-directions-title {
+    font-size: 1.3rem;
+    color: #000000;
+    margin: 0 0 15px;
+  }
+  
+  .contact-directions-text {
+    font-size: 1rem;
+    line-height: 1.6;
+    color: #000000;
+    margin: 0;
+  }
+
+
+  @media (max-width: 2800px) {
+    .apsuastore-contact-item a {
+      font-size: 1.7rem;
+    }
+    .apsuastore-contact-icon {
+      width: 7%;
+    }
+    
+    .contact-section-title {
+      font-size: 2rem;
+    }
+  }
+  
+
+
+  @media (max-width: 2000px) {
+  
+    .apsuastore-contact-info h2 {
+      font-size: 25px;
+    }
+    
+    .apsuastore-contact-item a {
+      font-size: 1rem;
+    }
+    .apsuastore-contact-icon {
+      width: 6%;
+    }
+    
+    .contact-section-title {
+      font-size: 1.7rem;
+    }
+      
+      }
+
+  @media (max-width: 2000px) {
+  
+.apsuastore-contact-info h2 {
+  font-size: 25px;
+}
+
+.apsuastore-contact-item a {
+  font-size: 1rem;
+}
+.apsuastore-contact-icon {
+  width: 6%;
+}
+
+.contact-section-title {
+  font-size: 1.7rem;
+}
+  
+  }
+  
+  
+  @media (max-width: 1500px) {
+  
+  }
+  
+  
+  
+  @media (max-width: 1000px) {
+   
+  }
+  
+  
+  @media (max-width: 768px) {
+  
+  }
+  
+  
+  @media (max-width: 660px) {
+   
+  
+  }
+  
+  @media (max-width: 480px) {
+   
+  }
+  
+  @media (max-width: 420px) {
+   
+  }
+  
+  @media (max-width: 380px) {
+   
+  }
+  
+  /* расширения для адаптива
+@media (max-width: 2800px) {
+  
+}
+
+@media (max-width: 2000px) {
+
+
+}
+
+
+@media (max-width: 1500px) {
+
+}
+
+
+
+@media (max-width: 1000px) {
+ 
+}
+
+
+@media (max-width: 768px) {
+
+}
+
+
+@media (max-width: 660px) {
+ 
+
+}
+
+@media (max-width: 480px) {
+ 
+}
+
+@media (max-width: 420px) {
+ 
+}
+
+@media (max-width: 380px) {
+ 
+}
+
+*/

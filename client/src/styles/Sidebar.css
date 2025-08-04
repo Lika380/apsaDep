@@ -1,0 +1,45 @@
+.slider {
+    position: fixed;
+    top: 50%;
+    right: -350px; /* скрыт справа */
+    transform: translateY(-50%);
+    width: 320px;
+    height: 220px;
+    background: #222;
+    border-radius: 8px;
+    box-shadow: -3px 0 10px rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: right 0.4s ease;
+
+  }
+  
+  .slider.show {
+    right: 20px; /* виден справа с отступом */
+  }
+  
+  .slider img {
+    max-width: 280px;
+    max-height: 200px;
+    border-radius: 6px;
+  }
+  
+  .arrow {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0 10px;
+  }
+  
+  .arrow.left {
+    margin-right: 5px;
+  }
+  
+  .arrow.right {
+    margin-left: 5px;
+  }
+  

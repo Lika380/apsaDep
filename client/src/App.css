@@ -1,0 +1,28 @@
+
+:root {
+  --primary-color: linear-gradient(0deg, rgba(150, 158, 147, 0.4) 0%, rgba(95, 105, 92, 0.3) 100%);
+  --secondary-color: rgb(66, 72, 66);
+}
+/* ОБЯЗАТЕЛЬНО! */
+html, body, #root {
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+
+
+}
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* обязательно! */
+  overflow-x: hidden;
+  
+}
+
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  
+}

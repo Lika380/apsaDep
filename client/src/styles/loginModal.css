@@ -1,0 +1,175 @@
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  z-index: 10000;
+  display: flex !important;
+  visibility: visible !important;
+}
+
+.modal-content {
+  background: white;
+  padding: 2% 2%;
+  border-radius: 15px;
+  position: relative;
+  min-width: 300px;
+  height: 30%;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  width: 30%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 6%;
+}
+
+
+
+.switch-btn {
+  border: none;
+  background: none;
+  font-size: 14px;
+  color: rgb(120, 120, 96);
+}
+
+
+.modal-content h2 {
+  display: flex;
+  justify-content: center;
+  font-weight: 700;
+  color: rgb(106, 107, 107);
+}
+
+.modal-content form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+  width: 100%;
+}
+
+.modal-content input {
+  padding: 3% 8% 3% 5%;
+  font-size: 0.9rem;
+  opacity: 0.6;
+  border-radius: 8px;
+  border: 0.2px solid rgb(148, 148, 148);
+}
+
+.modal-content button[type="submit"] {
+  background: #0077ff;
+  color: white;
+  border: none;
+  padding: 0.7rem;
+  cursor: pointer;
+  width: 90%;
+  border-radius: 8px;
+  background: black;
+  font-weight: 700;
+}
+
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  background: transparent;
+  font-size: 1.5rem;
+  border: none;
+  cursor: pointer;
+  margin: 0 auto;
+}
+
+.auth-login, .auth-password, .auth-name, .auth-btn {
+width: 90%;
+margin: 0 auto;
+}
+
+
+
+@media (max-width: 1500px) {
+  .modal-content {
+    height: 40%;
+    gap: 6%;
+    min-width: 25%;
+  }
+}
+
+
+@media (max-width: 1300px) {
+  .modal-content {
+    height: 40%;
+    min-width: 25%;
+    
+  }
+}
+
+@media (max-width: 1200px) {
+  .switch-btn {
+    font-size: 0.8rem;
+  }
+  .modal-content {
+    min-width: 35%;
+    
+  }
+}
+@media (max-width: 1000px) {
+  .modal-content {
+    height: 28%;
+    gap: 6%;
+    min-width: 42%;
+  }
+  .switch-btn {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 800px) {
+  .modal-content {
+  
+    min-width: 54%;
+  }
+
+}
+
+@media (max-width: 650px) {
+  .modal-content {
+    height: 26%;
+    min-width: 64%;
+  }
+
+}
+
+@media (max-width: 550px) {
+  .modal-content {
+  
+    min-width: 75%;
+  }
+
+}
+
+@media (max-width: 450px) {
+  .modal-content {
+  
+    min-width: 85%;
+  }
+
+}
+
+@media (max-width: 380px) {
+  .modal-content {
+  
+    min-width: 95%;
+  }
+  .modal-content {
+    height: 26%;
+    gap: 6%;
+
+  }
+
+}

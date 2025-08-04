@@ -1,0 +1,111 @@
+.see-all-projects-btn {
+    width: 12%;
+    background: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.8% 0;
+    border: 0.9px solid var(--secondary-color);
+    border-radius: 14px;
+    text-decoration: none;
+    color: var(--secondary-color);
+    font-size: 13px;
+    margin-left: 3%;
+    margin-top: 3%;
+}
+
+.latest-projects-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(550px, 1fr));
+    gap: 3%;
+  }
+
+  
+@media (max-width: 2800px) {
+    .see-all-projects-btn {
+        font-size: 1.5rem;
+    }
+    
+}
+
+@media (max-width: 2000px) {
+
+    .see-all-projects-btn {
+        font-size: 1.2rem;
+    }
+}
+
+
+@media (max-width: 1500px) {
+    .see-all-projects-btn {
+        font-size: 0.8rem;
+        margin-top: 7%;
+    }
+}
+
+
+
+@media (max-width: 1000px) {
+   
+    .see-all-projects-btn {
+        font-size: 0.8rem;
+        margin-top: 7%;
+        padding: 1% 0;
+        width: 15%;
+        margin-top: 9%;
+    }
+}
+
+
+@media (max-width: 768px) {
+
+
+    .see-all-projects-btn {
+        font-size: 0.7rem;
+        margin-top: 7%;
+        width: 17%;
+        margin-top: 11%;
+    }
+}
+
+
+@media (max-width: 660px) {
+    .see-all-projects-btn {
+        font-size: 0.7rem;
+        margin-top: 7%;
+        width: 19%;
+        margin-top: 12%;
+
+    }
+
+}
+
+@media (max-width: 480px) {
+    .see-all-projects-btn {
+        font-size: 0.6rem;
+        margin-top: 7%;
+        width: 19%;
+        margin-top: 14%;
+
+    }
+}
+
+@media (max-width: 420px) {
+    .see-all-projects-btn {
+        font-size: 0.5rem;
+        margin-top: 7%;
+        width: 22%;
+        margin-top: 12%;
+
+    }
+}
+
+@media (max-width: 380px) {
+    .logo a {
+        font-size: 0.6rem;
+    }
+
+    .mobileMenu {
+        width: 40px;
+    }
+}
