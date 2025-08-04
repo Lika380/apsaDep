@@ -8,7 +8,7 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
 app.use(cors({
-  origin: "https://apsadepserver.onrender.com", // Разрешаем только твой фронтенд
+  origin: "https://apsadep.onrender.com", // Разрешаем только твой фронтенд
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"], // добавили OPTIONS
   allowedHeaders: ["Content-Type", "Authorization"], // важно для POST с JSON
   credentials: true
