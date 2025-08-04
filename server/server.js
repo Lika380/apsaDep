@@ -1676,12 +1676,12 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
 });
 
-// ✅ Обработка ошибок сервера
 server.on('error', (err) => {
   if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Порт ${PORT} уже используется. Возможно, сервер уже запущен.`);
+    console.error(`❌ Порт ${PORT} уже используется.`);
     process.exit(1);
   } else {
     console.error('Ошибка сервера:', err);
   }
 });
+
