@@ -20,7 +20,7 @@ export const Cart = () => {
     <div className="cartBlock">
       {filteredCart.length === 0 ? (
         <div className="empty-cart">
-          <p>Корзина пуста</p>
+          <p>Корзина пуста.</p>
           <p>Добавьте товары для оформления заказа</p>
         </div>
       ) : (
