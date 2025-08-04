@@ -9,22 +9,58 @@ const JWT_SECRET = 'your-secret-key-change-in-production';
 app.use(cors());
 app.use(express.json());
 const router = express.Router();
+require("dotenv").config();
+const nodemailer = require('nodemailer');
+
+
+function formatDateForSQLite(date) {
+  return date.toISOString().replace('T', ' ').substring(0, 19);
+}
+
+
+
+
+//для почты 
+const smtpUser = process.env.SMTP_USER;
+const smtpPass = process.env.SMTP_PASS;
+
 
 // Инициализация базы данных
 const db = new sqlite3.Database('./new_database.db');
 
-
+const categoriesData = [
+  [1, 'Телевизоры и цифровое ТВ', null],
+  [2, 'Смартфоны и гаджеты', null],
+  [3, 'Одежда и обувь', null],
+  // ...
+  [101, '12-28 дюймов', 1],
+  [102, '12-27 дюймов', 101],
+];
 
 
 // Создание таблиц
 db.serialize(() => {
 //для названиии категории 
-  db.run(`
-    CREATE TABLE IF NOT EXISTS main_offer (
-      id TEXT PRIMARY KEY,
-      text TEXT NOT NULL
-    )
-  `);
+db.run(`CREATE TABLE IF NOT EXISTS categories (
+  id INTEGER PRIMARY KEY,
+  name TEXT NOT NULL,
+  parent_id INTEGER DEFAULT NULL,
+  FOREIGN KEY (parent_id) REFERENCES categories (id)
+)`);
+
+categoriesData.forEach(([id, name, parent_id]) => {
+  db.run(
+    `INSERT OR IGNORE INTO categories (id, name, parent_id) VALUES (?, ?, ?)`,
+    [id, name, parent_id],
+    (err) => {
+      if (err) {
+        console.error('Ошибка вставки категории', id, err.message);
+      }
+    }
+  );
+});
+
+  
 
   db.run(`
     CREATE TABLE IF NOT EXISTS popular (
@@ -108,20 +144,25 @@ db.serialize(() => {
   `);
   // Таблица пользователей
   db.run(`CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password TEXT NOT NULL,
-    role TEXT DEFAULT 'user',
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE,
+  phone TEXT UNIQUE,
+  password TEXT NOT NULL,
+  is_verified BOOLEAN DEFAULT 0,
+  role TEXT DEFAULT 'user',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`);
 
-  // Таблица категорий товаров
-  db.run(`CREATE TABLE IF NOT EXISTS categories (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    parent_id INTEGER DEFAULT NULL,
-    FOREIGN KEY (parent_id) REFERENCES categories (id)
-  )`);
+  db.run(`
+    CREATE TABLE IF NOT EXISTS email_verifications (
+      user_id INTEGER,
+      token TEXT,
+      expires_at DATETIME,
+      FOREIGN KEY(user_id) REFERENCES users(id)
+    )
+  `);
+  
+
 
   // Таблица товаров
   db.run(`CREATE TABLE IF NOT EXISTS products (
@@ -147,14 +188,27 @@ db.serialize(() => {
     FOREIGN KEY (product_id) REFERENCES products (id)
   )`);
 
+  db.run(`CREATE TABLE IF NOT EXISTS reviews (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    productId TEXT,
+    text TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+  );`);
+  
+  
 
   // Создание администратора по умолчанию
   const adminPassword = bcrypt.hashSync('admin123', 10);
-  db.run(`INSERT OR IGNORE INTO users (username, password, role) VALUES ('admin', ?, 'admin')`, [adminPassword]);  
+  db.run(`INSERT OR IGNORE INTO users (email, phone, password, role) VALUES (?, ?, ?, ?)`, ['admin@example.com', null, adminPassword, 'admin']);
+
+
+
   db.run(`INSERT OR IGNORE INTO categories (id, name) VALUES 
     (1, 'Телевизоры и цифровое ТВ'),
     (2, 'Смартфоны и гаджеты'),
-    (3, 'Ноутбуки и компьютеры'),
+    (3, 'Красота и здоровье'),
     (4, 'Аудиотехника'),
     (5, 'Техника для кухни'),
     (6, 'Техника для дома'),
@@ -168,188 +222,6 @@ db.serialize(() => {
     (14, 'Автоэлектроника'),
     (15, 'Строительство и ремонт'),
     (16, 'Дача, сад и огород')`);
-
-  db.run(`INSERT OR IGNORE INTO categories (id, name, parent_id) VALUES 
-    -- Телевизоры и цифровое ТВ
-    (101, 'Телевизоры', 1),
-    (102, '12-27 дюймов', 101),
-    (103, '28-38 дюймов', 101),
-    (104, '39-49 дюймов', 101),
-    (105, '50-64 дюйма', 101),
-    (106, '65-74 дюйма', 101),
-    (107, '75 дюймов и больше', 101),
-    (108, 'Smart TV', 101),
-    (109, '4K Ultra HD', 101),
-    (110, 'OLED телевизоры', 101),
-    (111, 'QLED телевизоры', 101),
-
-    
-    -- Смартфоны и гаджеты
-    (201, 'Смартфоны', 2),
-    (202, 'iPhone', 201),
-    (203, 'Samsung Galaxy', 201),
-    (204, 'Xiaomi', 201),
-    (205, 'Huawei', 201),
-    (206, 'Honor', 201),
-    (207, 'OPPO', 201),
-    (208, 'Realme', 201),
-    (209, 'OnePlus', 201),
-    (210, 'Планшеты', 2),
-    (211, 'iPad', 210),
-    (212, 'Samsung Tab', 210),
-    (213, 'Android планшеты', 210),
-    (214, 'Умные часы и браслеты', 2),
-    (215, 'Apple Watch', 214),
-
-    
-    -- Ноутбуки и компьютеры
-    (301, 'Ноутбуки', 3),
-    (302, 'Ультрабуки', 301),
-    (303, 'Игровые ноутбуки', 301),
-    (304, 'Офисные ноутбуки', 301),
-    (305, 'MacBook', 301),
-
-    -- Аудиотехника
-    (401, 'Наушники', 4),
-    (402, 'Полноразмерные наушники', 401),
-
-    
-    -- Техника для кухни
-    (501, 'Крупная бытовая техника', 5),
-    (502, 'Холодильники', 501),
-    (503, 'Двухкамерные холодильники', 502),
-    (504, 'Side-by-Side', 502),
-    (505, 'Морозильные камеры', 502),
-
-    
-    -- Техника для дома
-    (601, 'Климатическая техника', 6),
-    (602, 'Кондиционеры', 601),
-    (603, 'Сплит-системы', 602),
-    (604, 'Мобильные кондиционеры', 602),
-
-    
-    -- Красота и здоровье
-    (701, 'Техника для ухода за волосами', 7),
-    (702, 'Фены', 701),
-    (703, 'Плойки', 701),
-
-    
-    -- Умный дом
-    (801, 'Системы безопасности', 8),
-    (802, 'IP камеры', 801),
-    (803, 'Видеодомофоны', 801),
-    (804, 'Датчики движения', 801),
-    (805, 'Сигнализации', 801),
-    (806, 'Умное освещение', 8),
-
-    
-    -- Посуда
-    (901, 'Кухонная посуда', 9),
-    (902, 'Кастрюли и сковороды', 901),
-    (903, 'Наборы посуды', 901),
-    (904, 'Ножи', 901),
-    (905, 'Кухонные принадлежности', 901),
-    (906, 'Столовая посуда', 9),
-
-    
-    -- Игры и софт
-    (1001, 'Видеоигры', 10),
-    (1002, 'PlayStation', 1001),
-    (1003, 'Xbox', 1001),
-    (1004, 'Nintendo Switch', 1001),
-    (1005, 'PC игры', 1001),
-    (1006, 'Игровые аксессуары', 10),
-
-    
-    -- Хобби и развлечения
-    (1101, 'Настольные игры', 11),
-    (1102, 'Пазлы', 11),
-    (1103, 'Конструкторы', 11),
-    (1104, 'Коллекционирование', 11),
-    
-    -- Спортивные товары
-    (1201, 'Фитнес', 12),
-    (1202, 'Тренажеры', 1201),
-    (1203, 'Гантели', 1201),
-    (1204, 'Коврики для йоги', 1201),
-    (1205, 'Велосипеды', 12),
-    
-    -- Фото и видео
-    (1301, 'Фотоаппараты', 13),
-    (1302, 'Зеркальные фотоаппараты', 1301),
-    (1303, 'Беззеркальные камеры', 1301),
-
-    
-    -- Автоэлектроника
-    (1401, 'Автомагнитолы', 14),
-    (1402, 'Навигаторы', 14),
-    (1403, 'Видеорегистраторы', 14),
-    
-    -- Строительство и ремонт
-    (1501, 'Электроинструменты', 15),
-    (1502, 'Дрели', 1501),
-    (1503, 'Перфораторы', 1501),
-    (1504, 'Шуруповерты', 1501),
-    
-    -- Дача, сад и огород
-    (1601, 'Садовая техника', 16),
-    (1602, 'Газонокосилки', 1601),
-    (1603, 'Триммеры', 1601),
-    (1604, 'Культиваторы', 1601),
-    (1605, 'Садовый инвентарь', 16),
-    
-    -- Товары для детей
-    (1701, 'Игрушки', 17),
-    (1702, 'Развивающие игрушки', 1701),
-    (1703, 'Куклы', 1701),
-    
-    -- Одежда и обувь
-    (1801, 'Мужская одежда', 18),
-    (1802, 'Рубашки', 1801),
-    (1803, 'Брюки', 1801),
-    (1804, 'Куртки', 1801),
-    
-    -- Канцелярия
-    (1901, 'Письменные принадлежности', 19),
-    (1902, 'Ручки', 1901),
-    (1903, 'Карандаши', 1901),
-    (1904, 'Маркеры', 1901),
-    
-    -- Книги
-    (2001, 'Художественная литература', 20),
-    (2002, 'Романы', 2001),
-    (2003, 'Детективы', 2001),
-    
-    -- Музыкальные инструменты
-    (2101, 'Струнные инструменты', 21),
-    (2102, 'Гитары', 2101),
-    (2103, 'Скрипки', 2101),
-    (2104, 'Клавишные инструменты', 21),
-    
-    -- Ювелирные изделия
-    (2201, 'Кольца', 22),
-    (2202, 'Серьги', 22),
-    (2203, 'Цепочки', 22),
-    
-    -- Путешествия и туризм
-    (2301, 'Чемоданы и сумки', 23),
-    (2302, 'Чемоданы', 2301),
-    (2303, 'Рюкзаки', 2301),
-    (2304, 'Дорожные сумки', 2301),
-    
-    -- Зоотовары
-    (2401, 'Товары для собак', 24),
-    (2402, 'Корм для собак', 2401),
-    (2403, 'Игрушки для собак', 2401),
-    (2404, 'Товары для кошек', 24),
-    
-    -- Продукты питания
-    (2501, 'Бакалея', 25),
-    (2502, 'Крупы', 2501),
-    (2503, 'Макароны', 2501),
-    (2504, 'Консервы', 2501)
-`);
 
 db.run(`
   CREATE TABLE IF NOT EXISTS products (
@@ -365,25 +237,6 @@ db.run(`
   )
 `);
 
-
-
-  // Обновленные тестовые товары с правильными категориями
-  const testProducts = [
-    // Телевизоры
-    { id: uuidv4(), name: 'Телевизор Samsung 55" 4K UHD', price: 65999, category_id: 109, stock_quantity: 5, description: 'Smart TV с поддержкой 4K HDR' },
-    { id: uuidv4(), name: 'Телевизор LG OLED 65"', price: 129999, category_id: 110, stock_quantity: 3, description: 'OLED телевизор премиум класса' },
-    
-    // Смартфоны
-    { id: uuidv4(), name: 'iPhone 15 Pro 256GB', price: 119999, category_id: 202, stock_quantity: 10, description: 'Последняя модель iPhone' },
-    { id: uuidv4(), name: 'iPhone 14 128GB', price: 79999, category_id: 202, stock_quantity: 15, description: 'iPhone предыдущего поколения' },
-    { id: uuidv4(), name: 'Samsung Galaxy S24 Ultra', price: 99999, category_id: 203, stock_quantity: 7, description: 'Флагманский Android смартфон' },
-
-  ];
-
-  testProducts.forEach(product => {
-    db.run(`INSERT OR IGNORE INTO products (id, name, price, category_id, stock_quantity) VALUES (?, ?, ?, ?, ?)`,
-      [product.id, product.name, product.price, product.category_id, product.stock_quantity]);
-  });
 });
 
 // Middleware для проверки JWT токена
@@ -406,41 +259,154 @@ const authenticateToken = (req, res, next) => {
 
 // Маршруты аутентификации
 app.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+  const { email, phone, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Логин и пароль обязательны' });
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email и пароль обязательны' });
   }
 
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    
-    db.run('INSERT INTO users (username, password) VALUES (?, ?)', 
-      [username, hashedPassword], function(err) {
-        if (err) {
-          if (err.message.includes('UNIQUE constraint failed')) {
-            return res.status(400).json({ message: 'Пользователь с таким логином уже существует' });
-          }
-          return res.status(500).json({ message: 'Ошибка создания пользователя' });
+    // Проверяем, есть ли пользователь с таким email
+    db.get('SELECT * FROM users WHERE email = ?', [email], async (err, existingUser) => {
+      if (err) return res.status(500).json({ message: 'Ошибка базы данных' });
+
+      if (existingUser) {
+        if (existingUser.is_verified) {
+          return res.status(400).json({ message: 'Пользователь уже зарегистрирован и подтверждён' });
+        } else {
+          // Пользователь есть, но не подтверждён — удаляем старые токены и отправляем новое письмо
+          db.run('DELETE FROM email_verifications WHERE user_id = ?', [existingUser.id], (err) => {
+            if (err) return res.status(500).json({ message: 'Ошибка удаления старых токенов' });
+
+            const token = uuidv4();
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();// 1 час
+
+            db.run(
+              'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
+              [existingUser.id, token, expiresAt],
+              async (err) => {
+                if (err) return res.status(500).json({ message: 'Ошибка создания токена' });
+
+                try {
+                  await sendVerificationEmail(email, token);
+                  return res.status(200).json({ message: 'Письмо подтверждения отправлено повторно' });
+                } catch {
+                  return res.status(500).json({ message: 'Ошибка отправки письма' });
+                }
+              }
+            );
+          });
         }
-        res.status(201).json({ message: 'Пользователь успешно создан' });
-      });
-  } catch (error) {
+      } else {
+        // Новый пользователь — создаём
+        const hashedPassword = await bcrypt.hash(password, 10);
+        db.run(
+          'INSERT INTO users (email, phone, password, role, is_verified) VALUES (?, ?, ?, ?, ?)',
+          [email, phone || null, hashedPassword, 'user', 0],
+          function (err) {
+            if (err) {
+              return res.status(400).json({ message: 'Пользователь уже существует' });
+            }
+
+            const userId = this.lastID;
+            const token = uuidv4();
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 час
+
+            db.run(
+              'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
+              [userId, token, expiresAt],
+              async (err) => {
+                if (err) return res.status(500).json({ message: 'Ошибка подтверждения' });
+
+                try {
+                  await sendVerificationEmail(email, token);
+                  res.status(201).json({ message: 'Письмо отправлено. Подтвердите email' });
+                } catch (e) {
+                  res.status(500).json({ message: 'Ошибка отправки письма' });
+                }
+              }
+            );
+          }
+        );
+      }
+    });
+  } catch (err) {
     res.status(500).json({ message: 'Ошибка сервера' });
   }
 });
 
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
 
-  if (!username || !password) {
-    return res.status(400).json({ message: 'Логин и пароль обязательны' });
+app.get('/api/verify-email', (req, res) => {
+  const { token } = req.query;
+  if (!token) return res.status(400).send('Токен не указан');
+
+  db.get('SELECT * FROM email_verifications WHERE token = ?', [token], (err, row) => {
+    if (err || !row) return res.status(400).send('Неверный токен');
+
+    const now = new Date();
+    const expiresAt = new Date(row.expires_at.replace(' ', 'T')); // 👈 фикс даты
+
+    if (expiresAt < now) {
+      return res.status(400).send('Токен просрочен');
+    }
+
+    db.run('UPDATE users SET is_verified = 1 WHERE id = ?', [row.user_id]);
+    db.run('DELETE FROM email_verifications WHERE user_id = ?', [row.user_id]);
+    res.send('Email подтвержден. Теперь вы можете войти.');
+  });
+});
+
+
+
+
+
+
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST,        // smtp.gmail.com
+  port: parseInt(process.env.SMTP_PORT), // 587
+  secure: false,                      // обязательно для 587
+  auth: {
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
+  }
+});
+
+
+function sendVerificationEmail(email, token) {
+  const url = `http://localhost:3001/api/verify-email?token=${token}`;
+  console.log(`📧 Попытка отправки письма на ${email} со ссылкой: ${url}`);
+  return transporter.sendMail({
+    from: `"Магазин" <${smtpUser}>`,
+    to: email,
+    subject: 'Подтвердите вашу почту',
+    html: `<p>Нажмите на ссылку для подтверждения:</p><a href="${url}">${url}</a>`
+  }, (err, info) => {
+    if (err) {
+      console.error("Ошибка при отправке письма:", err);
+    } else {
+      console.log("Письмо успешно отправлено:", info.response);
+    }
+  });
+}
+
+
+transporter.verify((error, success) => {
+  if (error) {
+    console.error("❌ SMTP не работает:", error);
+  } else {
+    console.log("✅ SMTP готов к отправке писем");
+  }
+});
+
+app.post('/login', (req, res) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res.status(400).json({ message: 'Email и пароль обязательны' });
   }
 
-  db.get('SELECT * FROM users WHERE username = ?', [username], async (err, user) => {
-    if (err) {
-      return res.status(500).json({ message: 'Ошибка базы данных' });
-    }
+  db.get('SELECT * FROM users WHERE email = ?', [email], async (err, user) => {
+    if (err) return res.status(500).json({ message: 'Ошибка при поиске пользователя' });
 
     if (!user) {
       return res.status(401).json({ message: 'Неверные учетные данные' });
@@ -451,22 +417,140 @@ app.post('/login', (req, res) => {
       return res.status(401).json({ message: 'Неверные учетные данные' });
     }
 
+    // 🛑 Если не подтверждён — отправить новое письмо
+    if (!user.is_verified && user.role !== 'admin') {
+      const token = uuidv4();
+      const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+
+      // Удалить старые токены
+      db.run('DELETE FROM email_verifications WHERE user_id = ?', [user.id], (err) => {
+        if (err) return res.status(500).json({ message: 'Ошибка очистки старых токенов' });
+
+        // Вставить новый токен
+        db.run(
+          'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
+          [user.id, token, expiresAt],
+          async (err) => {
+            if (err) return res.status(500).json({ message: 'Ошибка сохранения нового токена' });
+
+            try {
+              await sendVerificationEmail(email, token);
+              return res.status(403).json({ message: 'Сначала подтвердите почту — письмо отправлено повторно' });
+            } catch {
+              return res.status(500).json({ message: 'Не удалось отправить письмо' });
+            }
+          }
+        );
+      });
+
+      return; // Важно: остановить выполнение здесь
+    }
+
+    // ✅ Всё хорошо — возвращаем JWT
     const token = jwt.sign(
-      { id: user.id, username: user.username, role: user.role },
+      { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
       { expiresIn: '24h' }
     );
 
     res.json({
       token,
+      email: user.email,
       role: user.role,
-      username: user.username
     });
   });
 });
 
 
-app.get('/api/products', (req, res) => {
+
+app.post('/api/reviews', authenticateToken, (req, res) => {
+  const { text, productId } = req.body;
+  console.log("Получен запрос на добавление отзыва:", { userId: req.user.id, text, productId });
+
+  if (!text || !productId) {
+    return res.status(400).json({ message: 'Текст отзыва и ID товара обязательны' });
+  }
+
+  const sql = 'INSERT INTO reviews (user_id, productId, text) VALUES (?, ?, ?)';
+  db.run(sql, [req.user.id, productId, text], function (err) {
+    if (err) {
+      console.error("Ошибка вставки отзыва:", err);
+      return res.status(500).json({ message: 'Ошибка сохранения отзыва' });
+    }
+
+    res.json({ message: 'Отзыв добавлен', reviewId: this.lastID });
+  });
+});
+
+
+app.get('/api/reviews', (req, res) => {
+  const { productId } = req.query;
+
+  let sql = `
+    SELECT reviews.id, reviews.text, reviews.created_at, users.email, users.phone
+    FROM reviews
+    LEFT JOIN users ON reviews.user_id = users.id
+  `;
+
+  const params = [];
+
+  if (productId) {
+    sql += ' WHERE reviews.productId = ?';
+    params.push(productId);
+  }
+
+  sql += ' ORDER BY reviews.created_at DESC';
+
+  db.all(sql, params, (err, rows) => {
+    if (err) {
+      return res.status(500).json({ message: 'Ошибка получения отзывов' });
+    }
+    const formatted = rows.map(row => ({
+      id: row.id,
+      text: row.text,
+      created_at: row.created_at,
+      user_id: row.user_id,
+      user_identifier: row?.email || row?.phone || '',
+    }));
+    res.json(formatted);
+  });
+});
+
+
+// Удаление отзыва (только для админа)
+app.delete('/api/reviews/:id', authenticateToken, (req, res) => {
+  const reviewId = req.params.id;
+
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ message: 'Доступ запрещен' });
+  }
+
+  db.run('DELETE FROM reviews WHERE id = ?', [reviewId], function (err) {
+    if (err) {
+      return res.status(500).json({ message: 'Ошибка удаления отзыва' });
+    }
+    if (this.changes === 0) {
+      return res.status(404).json({ message: 'Отзыв не найден' });
+    }
+    res.json({ message: 'Отзыв удален' });
+  });
+});
+
+
+// Админ: получить всех пользователей
+app.get('/api/admin/users', authenticateToken, (req, res) => {
+  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
+
+  db.all('SELECT id, email, phone, role, created_at FROM users', (err, users) => {
+    if (err) return res.status(500).json({ message: 'Ошибка получения пользователей' });
+    res.json(users);
+  });
+});
+
+
+
+app.get('/api/products/category/:category_id', (req, res) => {
+  const category_id = Number(req.params.category_id);
   const tables = ['products', 'popular', 'category1', 'category2', 'category3', 'category4', 'category5'];
   let allProducts = [];
   let index = 0;
@@ -476,7 +560,7 @@ app.get('/api/products', (req, res) => {
       return res.json(allProducts);
     }
     const table = tables[index];
-    db.all(`SELECT *, '${table}' as source_table FROM ${table}`, (err, rows) => {
+    db.all(`SELECT *, '${table}' as source_table FROM ${table} WHERE category_id = ?`, [category_id], (err, rows) => {
       if (err) {
         return res.status(500).json({ message: `Ошибка при запросе из таблицы ${table}` });
       }
@@ -489,34 +573,77 @@ app.get('/api/products', (req, res) => {
   fetchNext();
 });
 
-app.get('/api/products/:id', (req, res) => {
-  const { id } = req.params;
-  const tables = ['products', 'popular', 'category1', 'category2', 'category3', 'category4', 'category5'];
+app.get('/api/products/by-category/:id', (req, res) => {
+  const category_id = parseInt(req.params.id);
 
-  let index = 0;
+  // Получаем все подкатегории + саму категорию
+  const getSubcategories = `
+    SELECT id FROM categories WHERE id = ? OR parent_id = ?
+  `;
 
-  const searchNextTable = () => {
-    if (index >= tables.length) {
-      return res.status(404).json({ message: 'Product not found' });
-    }
+  db.all(getSubcategories, [category_id, category_id], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Ошибка получения подкатегорий' });
 
-    const table = tables[index];
-    db.get(`SELECT *, '${table}' as source_table FROM ${table} WHERE id = ?`, [id], (err, row) => {
-      if (err) {
-        return res.status(500).json({ message: `Ошибка при запросе из таблицы ${table}` });
-      }
-      if (row) {
-        return res.json(row);
-      } else {
-        index++;
-        searchNextTable();
-      }
+    const category_ids = rows.map(row => row.id);
+
+    // Получаем все товары по этим категориям
+    const placeholders = category_ids.map(() => '?').join(',');
+    const getProducts = `SELECT * FROM products WHERE category_id IN (${placeholders})`;
+
+    db.all(getProducts, category_ids, (err, products) => {
+      if (err) return res.status(500).json({ message: 'Ошибка получения товаров' });
+
+      res.json(products);
     });
-  };
-
-  searchNextTable();
+  });
 });
 
+app.get('/api/subcategory/:id', (req, res) => {
+  const { id } = req.params;
+  db.all(`SELECT * FROM products WHERE subCategoryId = ?`, [id], (err, rows) => {
+    if (err) return res.status(500).json({ message: 'Ошибка базы данных' });
+    res.json(rows);
+  });
+});
+ 
+
+app.get('/api/products', (req, res) => {
+  const { subCategoryId, category_id } = req.query;
+
+  let query = 'SELECT * FROM products WHERE 1=1';
+  const params = [];
+
+  if (category_id) {
+    query += ' AND category_id = ?';
+    params.push(category_id);
+  }
+
+  if (subCategoryId) {
+    query += ' AND subCategoryId = ?';
+    params.push(subCategoryId);
+  }
+
+  db.all(query, params, (err, rows) => {
+    if (err) {
+      console.error("Ошибка базы данных:", err);
+      return res.status(500).json({ error: 'Database error' });
+    }
+    res.json(rows);
+  });
+});
+
+app.get('/api/products/:id', (req, res) => {
+  const { id } = req.params;
+  db.get('SELECT * FROM products WHERE id = ?', [id], (err, row) => {
+    if (err) {
+      res.status(500).json({ error: 'Ошибка базы данных' });
+    } else if (!row) {
+      res.status(404).json({ error: 'Товар не найден' });
+    } else {
+      res.json(row);
+    }
+  });
+});
 
 
 app.get('/api/catalog/product/:id', (req, res) => {
@@ -608,6 +735,8 @@ app.post('/api/cart', authenticateToken, (req, res) => {
       });
   });
 });
+
+
 app.get('/api/projects', (req, res) => {
   db.all('SELECT * FROM projects ORDER BY ROWID DESC', (err, rows) => {
     if (err) {
@@ -626,7 +755,44 @@ app.get('/api/projects/latest', (req, res) => {
     res.json(rows);
   });
 });
- 
+
+
+app.post("/api/admin/projects", async (req, res) => {
+  const { name, description, image_url } = req.body;
+
+  if (!name || !description) {
+    return res.status(400).json({ error: "Неверные данные" });
+  }
+
+  try {
+    const stmt = db.prepare(
+      "INSERT INTO projects (id, name, description, image_url) VALUES (?, ?, ?, ?)"
+    );
+
+    const id = uuidv4();
+
+    stmt.run(id, name, description, image_url || null, function (err) {
+      if (err) {
+        console.error(err);
+        return res.status(500).json({ error: "Ошибка сервера" });
+      }
+      res.status(201).json({
+        message: "Проект создан",
+        project: {
+          id,
+          name,
+          description,
+          image_url
+        }
+      });
+    });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Ошибка сервера" });
+  }
+});
+
+
 //для категории 1
 app.get('/api/category1', (req, res) => {
   console.log('Запрос /api/category1 получен');
@@ -1126,15 +1292,15 @@ app.delete('/api/cart/:product_id', authenticateToken, (req, res) => {
 
 app.put('/api/popular/:id', (req, res) => {
   const { id } = req.params;
-  const { name, description, price, image_url, } = req.body;
+  const { name, description, price, image_url, instagram, whatsapp, website, } = req.body;
 
   const sql = `
     UPDATE popular
-    SET name = ?, description = ?, price = ?, image_url = ?
+    SET name = ?, description = ?, price = ?, image_url = ?, instagram = ?, whatsapp = ?, website = ?
     WHERE id = ?
   `;
 
-  db.run(sql, [name, description, price, image_url, id], function(err) {
+  db.run(sql, [name, description, price, image_url, instagram, whatsapp, website, id], function(err) {
     if (err) {
       console.error('Ошибка обновления popular:', err);
       return res.status(500).json({ message: 'Ошибка базы данных' });
@@ -1143,24 +1309,6 @@ app.put('/api/popular/:id', (req, res) => {
       return res.status(404).json({ message: 'Популярный продукт не найден' });
     }
     res.json({ message: 'Популярный продукт обновлен' });
-  });
-});
-
-
-
-app.post('/api/admin/products', (req, res) => {
-  const { name, description, price, category_id, image_url, stock_quantity, website, instagram, whatsapp } = req.body;
-  const sql = `
-    INSERT INTO products
-    (name, description, price, category_id, image_url, stock_quantity, website, instagram, whatsapp)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-  `;
-  db.run(sql, [name, description, price, category_id, image_url, stock_quantity, website, instagram, whatsapp], function(err) {
-    if (err) {
-      console.error(err);
-      return res.status(500).json({ error: "Ошибка добавления продукта" });
-    }
-    res.json({ id: this.lastID });
   });
 });
 
@@ -1179,33 +1327,30 @@ app.get('/api/projects/latest', (req, res) => {
 
 
 
-// Админ: получить всех пользователей
-app.get('/api/admin/users', authenticateToken, (req, res) => {
-  if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
-
-  db.all('SELECT id, username, role, created_at FROM users', (err, users) => {
-    if (err) return res.status(500).json({ message: 'Ошибка получения пользователей' });
-    res.json(users);
-  });
-});
 
 // Админ: создать продукт
 // Создание продукта (POST /api/admin/products)
 app.post('/api/admin/products', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
-  const { name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp } = req.body;
+  console.log("Данные нового товара:", req.body); 
+  
+  const { name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp, subCategoryId } = req.body;
   const id = uuidv4();
 
   db.run(
-    'INSERT INTO products (id, name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-    [id, name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp],
+    'INSERT INTO products (id, name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp, subCategoryId) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+    [id, name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp, subCategoryId],
     (err) => {
-      if (err) return res.status(500).json({ message: 'Ошибка создания товара' });
+      if (err) {
+        console.error('Ошибка создания товара:', err);
+        return res.status(500).json({ message: 'Ошибка создания товара' });
+      }
       res.status(201).json({ message: 'Товар создан', id });
     }
   );
 });
+
 
 
 app.use((req, res, next) => {
@@ -1247,12 +1392,13 @@ app.put('/api/admin/products/:id', authenticateToken, (req, res) => {
     stock_quantity,
     website, // добавлено
     instagram,
-    whatsapp
+    whatsapp,
+    subCategoryId
   } = req.body;
 
   db.run(
-    'UPDATE products SET name = ?, description = ?, price = ?, category_id = ?, image_url = ?, stock_quantity = ?, website = ?, instagram = ?, whatsapp = ? WHERE id = ?',
-    [name, description, price, category_id, image_url, stock_quantity, website, instagram, whatsapp, id],
+    'UPDATE products SET name = ?, description = ?, price = ?, category_id = ?, image_url = ?, stock_quantity = ?, website = ?, instagram = ?, whatsapp = ?, subCategoryId = ? WHERE id = ?',
+    [name, description, price, category_id, image_url, stock_quantity, website, instagram, whatsapp, subCategoryId, id],
     function (err) {
       if (err) {
         console.error('Ошибка обновления товара в БД:', err);
@@ -1263,9 +1409,6 @@ app.put('/api/admin/products/:id', authenticateToken, (req, res) => {
     }
   );
 });
-
-
-
 
 // Удаление популярного продукта
 app.delete('/api/popular/:id', (req, res) => {
@@ -1330,9 +1473,6 @@ app.delete('/api/admin/projects/:id', authenticateToken, (req, res) => {
   });
 });
 
-
-
-
 // Получить товары по категории
 app.get("/api/products/category/:categoryName", (req, res) => {
   const categoryName = req.params.categoryName;
@@ -1353,12 +1493,6 @@ app.get("/api/products/category/:categoryName", (req, res) => {
   });
 });
 
-
-
-
-// Обработка закрытия приложения
-// ✅ Роуты объявляются здесь, вне process.on
-// POST — создать новую запись
 app.post('/api/main-offers/:key', (req, res) => {
   const { key } = req.params;
   const { text } = req.body;
@@ -1528,3 +1662,4 @@ server.on('error', (err) => {
     console.error('Ошибка сервера:', err);
   }
 });
+

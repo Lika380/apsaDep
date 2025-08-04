@@ -2,5 +2,8 @@
   "dependencies": {
     "firebase": "^11.10.0",
     "react-router-dom": "^7.6.3"
+  },
+  "devDependencies": {
+    "ts-prune": "^0.10.3"
   }
 }
