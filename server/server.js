@@ -1639,6 +1639,7 @@ app.post('/api/messages', (req, res) => {
 
 
 // ✅ Обработка закрытия БД — отдельно
+// ✅ Обработка закрытия БД
 process.on('SIGINT', () => {
   db.close((err) => {
     if (err) {
@@ -1649,35 +1650,33 @@ process.on('SIGINT', () => {
   });
 });
 
-
-const PORT = process.env.PORT || 3001;
-const server = app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
-
-
-server.on('error', (err) => {
-  if (err.code === 'EADDRINUSE') {
-    console.error(`❌ Порт ${PORT} уже используется. Возможно, сервер уже запущен или не был корректно завершён.`);
-    process.exit(1); // Завершить процесс, чтобы не зависал
-  } else {
-    console.error('Ошибка сервера:', err);
-  }
-});
-
-
+// 📌 Импорт для работы с путями
 import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// 📌 Отдаём статику фронта (после сборки он окажется в client/dist)
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// Любой другой API-роут должен быть выше этого catch-all
-
-// SPA fallback — для всех "чужих" маршрутов отдаём index.html
+// 📌 SPA fallback — всегда отдаём index.html, если роут не API
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
+// 📌 Запускаем сервер
+const PORT = process.env.PORT || 3001;
+const server = app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
+});
+
+// 📌 Обработка ошибок сервера
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Порт ${PORT} уже используется. Возможно, сервер уже запущен.`);
+    process.exit(1);
+  } else {
+    console.error('Ошибка сервера:', err);
+  }
 });
