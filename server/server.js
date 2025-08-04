@@ -373,8 +373,11 @@ const transporter = nodemailer.createTransport({
 
 
 function sendVerificationEmail(email, token) {
-  const url = `http://localhost:3001/api/verify-email?token=${token}`;
+  const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
+  const url = `${baseUrl}/api/verify-email?token=${token}`;
+
   console.log(`📧 Попытка отправки письма на ${email} со ссылкой: ${url}`);
+
   return transporter.sendMail({
     from: `"Магазин" <${smtpUser}>`,
     to: email,
@@ -388,6 +391,7 @@ function sendVerificationEmail(email, token) {
     }
   });
 }
+
 
 
 transporter.verify((error, success) => {
