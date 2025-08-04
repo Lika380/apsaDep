@@ -13,11 +13,10 @@ require("dotenv").config();
 const nodemailer = require('nodemailer');
 
 
+
 function formatDateForSQLite(date) {
   return date.toISOString().replace('T', ' ').substring(0, 19);
 }
-
-
 
 
 //для почты 
@@ -1663,3 +1662,18 @@ server.on('error', (err) => {
   }
 });
 
+
+
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Раздаём собранный фронтенд
+app.use(express.static(path.join(__dirname, 'client', 'dist')));
+
+// Для всех маршрутов, кроме API, отдаём index.html
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
+});
