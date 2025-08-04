@@ -8,7 +8,11 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
 const JWT_SECRET = 'your-secret-key-change-in-production';
-app.use(cors());
+app.use(cors({
+  origin: "https://apsadepserver.onrender.com", // Разрешаем только твой фронтенд
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 app.use(express.json());
 const router = express.Router();
 import nodemailer from 'nodemailer';
