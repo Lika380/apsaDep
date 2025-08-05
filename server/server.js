@@ -8,14 +8,25 @@ import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
 
-const FRONTEND_ORIGIN = process.env.FRONTEND_ORIGIN || "https://apsadep.onrender.com";
+
+
+const allowedOrigins = [
+  'https://apsadepserver.onrender.com',
+  'http://localhost:5173',
+];
+
 app.use(cors({
-  origin: FRONTEND_ORIGIN,
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
+  credentials: true,
 }));
-
 
 
 
