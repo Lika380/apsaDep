@@ -9,7 +9,7 @@ dotenv.config();
 import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
-
+import fs from 'fs';
 
 const app = express();
 
@@ -1719,7 +1719,13 @@ db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
 
 // В самом конце
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
+  const indexPath = path.join(__dirname, '../client/dist', 'index.html');
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    console.error('❌ index.html не найден по пути:', indexPath);
+    res.status(404).send('index.html не найден');
+  }
 });
 
 // ✅ Запускаем сервер
