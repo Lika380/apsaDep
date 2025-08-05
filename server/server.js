@@ -7,6 +7,15 @@ import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
 dotenv.config(); 
 const app = express();
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+
+
+
+app.use(express.static(path.join(__dirname, 'dist')));
+
+// SPA fallback:
 
 
 const allowedOrigins = [
@@ -1708,6 +1717,12 @@ app.get('*', (req, res) => {
     return res.status(404).json({ message: 'API route not found' });
   }
   res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+});
+
+
+// В самом конце
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
 });
 
 // ✅ Запускаем сервер
