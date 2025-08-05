@@ -21,8 +21,10 @@ app.use('/assets', express.static(path.join(__dirname, '../client/dist', 'assets
 
 const allowedOrigins = [
   'https://apsadep.onrender.com',
+  'https://apsadepserver.onrender.com', // 👈 ДОБАВЬ ЭТО
   'http://localhost:5173',
 ];
+
 
 app.use(cors({
   origin: function (origin, callback) {
