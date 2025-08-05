@@ -30,12 +30,7 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# Build
-dist/
-build/
 
-# Стало:
-!client/dist
 
 # System
 .DS_Store

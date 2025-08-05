@@ -9,12 +9,8 @@
 /coverage
 
 # production
-/build
-/dist
 
 
-# Разрешить client/dist
-!client/dist
 
 # misc
 .DS_Store
