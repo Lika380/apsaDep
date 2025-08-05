@@ -1719,7 +1719,7 @@ db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
 
 // В самом конце
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 // ✅ Запускаем сервер
