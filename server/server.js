@@ -9,9 +9,8 @@ dotenv.config();
 const app = express();
 
 
-
 const allowedOrigins = [
-  'https://apsadepserver.onrender.com',
+  'https://apsadep.onrender.com',
   'http://localhost:5173',
 ];
 
@@ -20,14 +19,15 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error("Not allowed by CORS"));
+      callback(new Error('Not allowed by CORS'));
     }
   },
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
 
+app.options('*', cors()); 
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
