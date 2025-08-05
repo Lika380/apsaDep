@@ -5,11 +5,11 @@ import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
+dotenv.config();
 import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 
-dotenv.config();
 
 const app = express();
 
@@ -71,9 +71,6 @@ if (!JWT_SECRET) {
   console.error("JWT_SECRET не задан в .env");
   process.exit(1);
 }
-
-import nodemailer from 'nodemailer';
-
 
 // Обработка preflight-запросов
 
