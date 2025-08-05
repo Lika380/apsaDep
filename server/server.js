@@ -28,16 +28,20 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
+    console.log("🔎 Origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.warn("❌ Запрещённый origin:", origin);
       callback(new Error('Not allowed by CORS'));
     }
-  },
+  },  
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
 }));
+
+
 
 app.options('*', cors()); 
 
@@ -223,10 +227,12 @@ categoriesData.forEach(([id, name, parent_id]) => {
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
     category_id INTEGER,
+    subCategoryId INTEGER, 
     image_url TEXT,
     stock_quantity INTEGER DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories (id)
+    FOREIGN KEY (category_id) REFERENCES categories (id),
+    FOREIGN KEY (subCategoryId) REFERENCES categories (id)
   )`);
 
   // Таблица корзины
@@ -274,20 +280,6 @@ categoriesData.forEach(([id, name, parent_id]) => {
     (14, 'Автоэлектроника'),
     (15, 'Строительство и ремонт'),
     (16, 'Дача, сад и огород')`);
-
-db.run(`
-  CREATE TABLE IF NOT EXISTS products (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    price DECIMAL(10,2) NOT NULL,
-    category_id INTEGER,
-    image_url TEXT,
-    stock_quantity INTEGER DEFAULT 0,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories (id)
-  )
-`);
 
 });
 
@@ -414,9 +406,9 @@ app.get('/api/verify-email', (req, res) => {
 
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,        // smtp.gmail.com
-  port: parseInt(process.env.SMTP_PORT), // 587
-  secure: false,                      // обязательно для 587
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT),
+  secure: process.env.SMTP_SECURE === 'true', // ✅ правильно использовать
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
@@ -431,7 +423,7 @@ function sendVerificationEmail(email, token) {
   console.log(`📧 Попытка отправки письма на ${email} со ссылкой: ${url}`);
 
   return transporter.sendMail({
-    from: `"Магазин" <${smtpUser}>`,
+    from: `"Магазин" <${process.env.SMTP_USER}>`,
     to: email,
     subject: 'Подтвердите вашу почту',
     html: `<p>Нажмите на ссылку для подтверждения:</p><a href="${url}">${url}</a>`
