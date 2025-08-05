@@ -418,7 +418,11 @@ const transporter = nodemailer.createTransport({
 });
 
 
-
+console.log('SMTP CONFIG', {
+  host: process.env.SMTP_HOST,
+  port: process.env.SMTP_PORT,
+  secure: process.env.SMTP_SECURE,
+});
 
 transporter.verify(function(error, success) {
   if (error) {
@@ -453,13 +457,7 @@ async function sendVerificationEmail(email, token) {
 
 
 
-transporter.verify((error, success) => {
-  if (error) {
-    console.error("❌ SMTP не работает:", error);
-  } else {
-    console.log("✅ SMTP готов к отправке писем");
-  }
-});
+
 
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
