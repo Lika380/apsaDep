@@ -408,14 +408,15 @@ app.get('/api/verify-email', (req, res) => {
 
 
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, // smtp.gmail.com
+  host: process.env.SMTP_HOST,
   port: parseInt(process.env.SMTP_PORT),
-  secure: true,
+  secure: process.env.SMTP_PORT === '465', // 👈 динамично
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   }
 });
+
 
 
 transporter.verify(function(error, success) {
@@ -1705,6 +1706,14 @@ process.on('SIGINT', () => {
     console.log('База данных закрыта.');
     process.exit(0);
   });
+});
+
+db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
+  if (err && !err.message.includes('duplicate column name')) {
+    console.error("Ошибка при добавлении subCategoryId:", err.message);
+  } else {
+    console.log("Колонка subCategoryId добавлена (или уже была)");
+  }
 });
 
 // ✅ Раздаём статические файлы React
