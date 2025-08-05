@@ -14,10 +14,10 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, 'dist')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // SPA fallback:
-app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets')));
+app.use('/assets', express.static(path.join(__dirname, '../client/dist', 'assets')));
 
 const allowedOrigins = [
   'https://apsadep.onrender.com',
@@ -1704,7 +1704,7 @@ process.on('SIGINT', () => {
 
 // В самом конце
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  res.sendFile(path.join(__dirname, '../client/dist', 'index.html'));
 });
 
 // ✅ Запускаем сервер
