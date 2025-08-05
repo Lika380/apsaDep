@@ -1701,7 +1701,6 @@ process.on('SIGINT', () => {
 
 // 📌 Импорт для работы с путями
 // ✅ Импорт для работы с путями
-import path from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
