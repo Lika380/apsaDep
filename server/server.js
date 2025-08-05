@@ -18,6 +18,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
+// теперь можно использовать __dirname
+const clientDistPath = path.join(__dirname, '../client/dist');
+console.log('Путь к фронтенду:', clientDistPath);
+console.log('Папка фронтенда существует?', fs.existsSync(clientDistPath));
+
+if (fs.existsSync(clientDistPath)) {
+  console.log('Содержимое папки фронтенда:', fs.readdirSync(clientDistPath));
+
+  const indexPath = path.join(clientDistPath, 'index.html');
+  console.log('index.html существует?', fs.existsSync(indexPath));
+} else {
+  console.error('Папка фронтенда не найдена! Проверь структуру проекта и пути.');
+}
+
 // ✅ Сначала включаем CORS
 const allowedOrigins = [
   'https://apsadep.onrender.com',
