@@ -5,23 +5,22 @@ import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import dotenv from 'dotenv';
-dotenv.config(); 
-const app = express();
 import path from 'path';
 import { fileURLToPath } from 'url';
+import nodemailer from 'nodemailer';
 
+dotenv.config();
+
+const app = express();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// SPA fallback:
-app.use('/assets', express.static(path.join(__dirname, '../client/dist', 'assets')));
-
+// ✅ Сначала включаем CORS
 const allowedOrigins = [
   'https://apsadep.onrender.com',
-  'https://apsadepserver.onrender.com', // 👈 ДОБАВЬ ЭТО
+  'https://apsadepserver.onrender.com',
   'http://localhost:5173',
 ];
 
@@ -41,9 +40,30 @@ app.use(cors({
   credentials: true,
 }));
 
-
-
 app.options('*', cors()); 
+app.use(express.json());
+
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
+// SPA fallback:
+app.use('/assets', express.static(path.join(__dirname, '../client/dist', 'assets')));
+
+
+
+const router = express.Router();
+
+router.post("/register", (req, res) => {
+  res.json({ message: "Регистрация прошла" });
+});
+app.use(router);
+
+
+
+app.post("/login", (req, res) => {
+  res.json({ message: "Login OK" });
+});
+
+app.listen(3000, () => console.log("Server running"));
 
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -52,22 +72,9 @@ if (!JWT_SECRET) {
   process.exit(1);
 }
 
-app.options('*', cors());
-app.use(express.json());
-const router = express.Router();
 import nodemailer from 'nodemailer';
 
-router.post("/register", (req, res) => {
-  res.json({ message: "Регистрация прошла" });
-});
-app.use(router);
 
-
-app.post("/login", (req, res) => {
-  res.json({ message: "Login OK" });
-});
-
-app.listen(3000, () => console.log("Server running"));
 // Обработка preflight-запросов
 
 
@@ -404,37 +411,47 @@ app.get('/api/verify-email', (req, res) => {
 
 
 
-
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
+  host: process.env.SMTP_HOST, // smtp.gmail.com
   port: parseInt(process.env.SMTP_PORT),
-  secure: process.env.SMTP_SECURE === 'true', // ✅ правильно использовать
+  secure: true,
   auth: {
     user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS
+    pass: process.env.SMTP_PASS,
   }
 });
 
 
-function sendVerificationEmail(email, token) {
+transporter.verify(function(error, success) {
+  if (error) {
+    console.error("SMTP проверка не прошла:", error);
+  } else {
+    console.log("✅ SMTP готов к отправке писем");
+  }
+});
+
+async function sendVerificationEmail(email, token) {
   const baseUrl = process.env.BASE_URL || `http://localhost:${process.env.PORT}`;
   const url = `${baseUrl}/api/verify-email?token=${token}`;
 
   console.log(`📧 Попытка отправки письма на ${email} со ссылкой: ${url}`);
 
-  return transporter.sendMail({
-    from: `"Магазин" <${process.env.SMTP_USER}>`,
-    to: email,
-    subject: 'Подтвердите вашу почту',
-    html: `<p>Нажмите на ссылку для подтверждения:</p><a href="${url}">${url}</a>`
-  }, (err, info) => {
-    if (err) {
-      console.error("Ошибка при отправке письма:", err);
-    } else {
-      console.log("Письмо успешно отправлено:", info.response);
-    }
-  });
+  try {
+    const info = await transporter.sendMail({
+      from: `"Магазин" <${process.env.SMTP_USER}>`,
+      to: email,
+      subject: 'Подтвердите вашу почту',
+      html: `<p>Нажмите на ссылку для подтверждения:</p><a href="${url}">${url}</a>`
+    });
+
+    console.log("✅ Письмо успешно отправлено:", info.response);
+    return true;
+  } catch (err) {
+    console.error("❌ Ошибка при отправке письма:", err);
+    return false;
+  }
 }
+ 
 
 
 
