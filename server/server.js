@@ -21,11 +21,11 @@ const __dirname = path.dirname(__filename);
 const allowedOrigins = [
   'https://apsadep.onrender.com',
   'https://apsadepserver.onrender.com',
-  'http://localhost:5173',
+  'http://localhost:5173', // Vite dev server
+  'http://localhost:3000', // Express dev
 ];
 
-
-app.use(cors({
+const corsOptions = {
   origin: function (origin, callback) {
     console.log("🔎 Origin:", origin);
     if (!origin || allowedOrigins.includes(origin)) {
@@ -34,13 +34,15 @@ app.use(cors({
       console.warn("❌ Запрещённый origin:", origin);
       callback(new Error('Not allowed by CORS'));
     }
-  },  
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true,
-}));
+};
 
-app.options('*', cors()); 
+app.use(cors(corsOptions));
+app.options('*', cors(corsOptions));
+
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, '../client/dist')));
@@ -55,16 +57,13 @@ const router = express.Router();
 router.post("/register", (req, res) => {
   res.json({ message: "Регистрация прошла" });
 });
-app.use(router);
-
 
 
 app.post("/login", (req, res) => {
   res.json({ message: "Login OK" });
 });
 
-app.listen(3000, () => console.log("Server running"));
-
+app.use(router);
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) {
