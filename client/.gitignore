@@ -34,6 +34,9 @@ pnpm-debug.log*
 dist/
 build/
 
+# Стало:
+!client/dist
+
 # System
 .DS_Store
 Thumbs.db
