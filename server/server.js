@@ -1,3 +1,5 @@
+
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
@@ -9,7 +11,6 @@ dotenv.config();
 import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
-import fs from 'fs';
 
 const app = express();
 
@@ -48,7 +49,7 @@ app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // SPA fallback:
-app.use('/assets', express.static(path.join(__dirname, '../client/dist', 'assets')));
+app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
 
 
 
