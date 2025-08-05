@@ -76,7 +76,8 @@ const smtpPass = process.env.SMTP_PASS;
 
 
 // Инициализация базы данных
-const db = new sqlite3.Database('./new_database.db');
+const db = new sqlite3.Database('/tmp/new_database.db');
+
 
 const categoriesData = [
   [1, 'Телевизоры и цифровое ТВ', null],
@@ -193,24 +194,39 @@ categoriesData.forEach(([id, name, parent_id]) => {
     )
   `);
   // Таблица пользователей
-  db.run(`CREATE TABLE IF NOT EXISTS users (
-   id INTEGER PRIMARY KEY AUTOINCREMENT,
-  email TEXT UNIQUE,
-  phone TEXT UNIQUE,
-  password TEXT NOT NULL,
-  is_verified BOOLEAN DEFAULT 0,
-  role TEXT DEFAULT 'user',
-  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-  )`);
-
   db.run(`
-    CREATE TABLE IF NOT EXISTS email_verifications (
-      user_id INTEGER,
-      token TEXT,
-      expires_at DATETIME,
-      FOREIGN KEY(user_id) REFERENCES users(id)
+    CREATE TABLE IF NOT EXISTS users (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      email TEXT UNIQUE,
+      phone TEXT UNIQUE,
+      password TEXT NOT NULL,
+      is_verified BOOLEAN DEFAULT 0,
+      role TEXT DEFAULT 'user',
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
     )
-  `);
+  `, (err) => {
+    if (err) {
+      console.error("Ошибка создания таблицы users:", err.message);
+    } else {
+      console.log("Таблица users готова");
+    }
+  });
+  
+  db.run(`
+CREATE TABLE IF NOT EXISTS email_verifications (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  token TEXT,
+  expires_at DATETIME,
+  FOREIGN KEY(user_id) REFERENCES users(id)
+)
+  `, (err) => {
+    if (err) {
+      console.error("Ошибка создания таблицы email_verifications:", err.message);
+    } else {
+      console.log("Таблица email_verifications готова");
+    }
+  });
   
 
 
