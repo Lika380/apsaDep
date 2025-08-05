@@ -17,7 +17,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // SPA fallback:
-
+app.use('/assets', express.static(path.join(__dirname, 'dist', 'assets')));
 
 const allowedOrigins = [
   'https://apsadep.onrender.com',
@@ -1703,16 +1703,6 @@ process.on('SIGINT', () => {
 
 
 // ✅ Раздаём статические файлы React
-
-// ✅ SPA fallback — всегда отдаём index.html, если запрос не к API
-app.get('*', (req, res) => {
-  // Если это API-запрос, не трогаем
-  if (req.originalUrl.startsWith('/api')) {
-    return res.status(404).json({ message: 'API route not found' });
-  }
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
-
 
 // В самом конце
 app.get('*', (req, res) => {
