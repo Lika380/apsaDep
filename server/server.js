@@ -1703,7 +1703,6 @@ process.on('SIGINT', () => {
 
 
 // ✅ Раздаём статические файлы React
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
 // ✅ SPA fallback — всегда отдаём index.html, если запрос не к API
 app.get('*', (req, res) => {
