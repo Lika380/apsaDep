@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { api } from "../utils/api";
+import { API_BASE_URL } from "../config";
 
 interface Project {
   id: string;
@@ -19,7 +20,7 @@ const ProjectsAdmin: React.FC = () => {
   // Загрузка проектов
   const loadProjects = async () => {
     try {
-      const response = await fetch('http://localhost:3001/api/projects');
+      const response = await fetch(`${API_BASE_URL}/api/projects`);
       if (!response.ok) throw new Error('Ошибка HTTP: ' + response.status);
       const data = await response.json();
       setProjects(data);

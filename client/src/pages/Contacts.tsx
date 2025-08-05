@@ -2,6 +2,7 @@ import React, { useState, ChangeEvent, FormEvent } from 'react';
 import '../styles/contacts.css';
 import IG from '../images/IG.png';
 import TG from '../images/tg.png';
+import { API_BASE_URL } from "../config";
 import WA from '../images/WA.png';
 
 type FormData = {
@@ -33,7 +34,7 @@ const Contacts: React.FC = () => {
     e.preventDefault();
   
     try {
-      const response = await fetch('http://localhost:3001/api/messages', {
+      const response = await fetch(`${API_BASE_URL}/api/messages`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),

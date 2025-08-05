@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import "../styles/projects.css"
 import ProjectCard from '../components/ProjectCard';
+import { API_BASE_URL } from "../config";
 
 interface Project {
     id: string;
@@ -13,7 +14,7 @@ const Projects = () => {
     const [projects, setProjects] = useState<Project[]>([]);
 
     useEffect(() => {
-        fetch('http://localhost:3001/api/projects')
+        fetch(`${API_BASE_URL}/api/projects`)
             .then(res => res.json())
             .then(data => setProjects(data))
             .catch(err => console.error("Ошибка загрузки проектов:", err)) 

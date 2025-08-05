@@ -13,6 +13,7 @@ import { productData } from "../components/product/productData";
 import { categoriesList } from "../components/product/productData";
 import { categoryMapping } from "../components/product/productData";
 import { subCategories } from "../components/product/productData";
+import { API_BASE_URL } from "../config";
 
 
 
@@ -604,7 +605,7 @@ const loadMessages = async () => {
   
   setLoadingMessages(true);
   try {
-    const res = await fetch('http://localhost:3001/api/messages');
+    const res = await fetch(`${API_BASE_URL}/api/messages`);
     const data = await res.json();
     setMessages(data);
   } catch (e) {
@@ -622,7 +623,7 @@ useEffect(() => {
 
 const handleDeleteMessage = async (id: number) => {
   try {
-    const res = await fetch(`http://localhost:3001/api/messages/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_BASE_URL}/api/messages/${id}`, { method: 'DELETE' });
     if (!res.ok) throw new Error('Ошибка удаления сообщения');
     setMessages(prev => prev.filter(m => m.id !== id));
   } catch (e) {
@@ -635,7 +636,7 @@ const handleDeleteMessage = async (id: number) => {
 const loadSubscribers = async () => {
   setLoadingSubscribers(true);
   try {
-    const res = await fetch('http://localhost:3001/api/subscribers');
+    const res = await fetch(`${API_BASE_URL}/api/subscribers`);
     const data = await res.json();
     setSubscribers(data);
   } catch (e) {
@@ -654,7 +655,7 @@ useEffect(() => {
 
 const handleDeleteSubscriber = async (id: number) => {
   try {
-    const res = await fetch(`http://localhost:3001/api/subscribers/${id}`, {
+    const res = await fetch(`${API_BASE_URL}/api/subscribers/${id}`, {
       method: 'DELETE',
     });
     if (!res.ok) {
@@ -669,7 +670,7 @@ const handleDeleteSubscriber = async (id: number) => {
 
   //для названии блоков с товарами в main.tsx
   useEffect(() => {
-    fetch('http://localhost:3001/api/main-offers')
+    fetch(`${API_BASE_URL}/api/main-offers`)
       .then(res => res.json())
       .then(data => {
         const obj: Record<string, string> = {};
@@ -685,7 +686,7 @@ const handleDeleteSubscriber = async (id: number) => {
   };
   
   const handleOfferSave = (key: string) => {
-    fetch(`http://localhost:3001/api/main-offers/${key}`, {
+    fetch(`${API_BASE_URL}/api/main-offers/${key}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ text: offers[key] }),

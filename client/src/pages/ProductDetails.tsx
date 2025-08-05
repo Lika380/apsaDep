@@ -7,6 +7,7 @@ import cartIcon from "../../public/cart.png";
 import { useAuth } from "../hooks/useAuth";
 import WA from '../images/WA.png';
 import IG from '../images/IG.png';
+import { API_BASE_URL } from "../config";
 
 interface Product {
   id: string;

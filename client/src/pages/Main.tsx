@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import { CategoryProduct } from "../utils/api"; 
 import { useCart } from "../components/CartContext";
 import { useSearch } from "../components/SearchContext";
+import { API_BASE_URL } from "../config";
 
 const slides = [
   { img: "https://i.postimg.cc/76BJk1WF/Frame_1529.jpg" },
@@ -137,7 +138,7 @@ const handleSubscribe = async (e: React.FormEvent) => {
   }
 
   try {
-    const response = await fetch('http://localhost:3001/api/subscribe', {
+    const response = await fetch(`${API_BASE_URL}/api/subscribe`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
@@ -162,7 +163,7 @@ const handleSubscribe = async (e: React.FormEvent) => {
 //для категории 1
 useEffect(() => {
   setLoading(true);
-  fetch('http://localhost:3001/api/category1')
+  fetch(`${API_BASE_URL}/api/category1`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();
@@ -182,7 +183,7 @@ useEffect(() => {
 
 
 useEffect(() => {
-  fetch('http://localhost:3001/api/main-offers')
+  fetch(`${API_BASE_URL}/api/main-offers`)
     .then(res => res.json())
     .then(data => {
       const obj: Record<string, string> = {};
@@ -197,7 +198,7 @@ useEffect(() => {
 //для категории 2
 useEffect(() => {
   setLoading(true);
-  fetch('http://localhost:3001/api/category2')
+  fetch(`${API_BASE_URL}/api/category2`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();
@@ -219,7 +220,7 @@ useEffect(() => {
 //для категории 3
 useEffect(() => {
   setLoading(true);
-  fetch('http://localhost:3001/api/category3')
+  fetch(`${API_BASE_URL}/api/category3`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();
@@ -241,7 +242,7 @@ useEffect(() => {
 //для категории 4
 useEffect(() => {
   setLoading(true);
-  fetch('http://localhost:3001/api/category4')
+  fetch(`${API_BASE_URL}/api/category4`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();
@@ -263,7 +264,7 @@ useEffect(() => {
 //для категории 5
 useEffect(() => {
   setLoading(true);
-  fetch('http://localhost:3001/api/category5')
+  fetch(`${API_BASE_URL}/api/category5`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();
@@ -285,7 +286,7 @@ useEffect(() => {
 //для популярных
   useEffect(() => {
     setLoading(true);
-    fetch('http://localhost:3001/api/popular')
+    fetch(`${API_BASE_URL}/api/popular`)
     .then(res => {
       if (!res.ok) throw new Error('Ошибка сети');
       return res.json();

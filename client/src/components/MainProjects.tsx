@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ProjectCard from '../components/ProjectCard';
 import "../styles/mainProjects.css"
+import { API_BASE_URL } from "../config";
 
 interface Project {
   id: string;
@@ -15,7 +16,7 @@ const MainProjects: React.FC = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('http://localhost:3001/api/projects/latest')
+    fetch(`${API_BASE_URL}/api/projects/latest`)
       .then(res => {
         if (!res.ok) {
           throw new Error(`Ошибка HTTP: ${res.status}`);
