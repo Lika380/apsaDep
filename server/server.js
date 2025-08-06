@@ -63,10 +63,6 @@ app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
-app.use(express.static(path.join(__dirname, '../client/dist')));
-
-// SPA fallback:
-app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
 
 
 
@@ -75,8 +71,6 @@ const router = express.Router();
 router.post("/register", (req, res) => {
   res.json({ message: "Регистрация прошла" });
 });
-
-
 
 
 app.use(router);
@@ -1709,8 +1703,6 @@ app.post('/api/messages', (req, res) => {
   });
 });
 
-
-
 // ✅ Обработка закрытия БД — отдельно
 // ✅ Обработка закрытия БД
 process.on('SIGINT', () => {
@@ -1732,6 +1724,10 @@ db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
 });
 
 // ✅ Раздаём статические файлы React
+// SPA fallback:
+app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
 
 // В самом конце
 app.get('*', (req, res) => {
