@@ -1,13 +1,14 @@
 
 import fs from 'fs';
+
+import dotenv from 'dotenv';
+dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
-import dotenv from 'dotenv';
-dotenv.config();
 import path from 'path';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
