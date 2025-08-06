@@ -1,8 +1,10 @@
 
-import fs from 'fs';
 
 import dotenv from 'dotenv';
 dotenv.config();
+
+
+import fs from 'fs';
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
@@ -75,9 +77,7 @@ router.post("/register", (req, res) => {
 });
 
 
-app.post("/login", (req, res) => {
-  res.json({ message: "Login OK" });
-});
+
 
 app.use(router);
 
