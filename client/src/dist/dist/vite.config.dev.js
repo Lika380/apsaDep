@@ -7,6 +7,6 @@ var vite_1 = require("vite");
 var plugin_react_1 = require("@vitejs/plugin-react");
 
 exports["default"] = vite_1.defineConfig({
-  base: '/',
+  base: '/assets/',
   plugins: [plugin_react_1["default"]()]
 });
