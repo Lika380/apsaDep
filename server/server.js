@@ -1726,6 +1726,9 @@ app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets'))
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
 
+app.use('/product/assets', express.static(path.join(__dirname, '../client/dist/assets')));
+app.use('/product', express.static(path.join(__dirname, '../client/dist')));
+
 // В самом конце
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, '../client/dist', 'index.html');
