@@ -68,9 +68,6 @@ app.use(express.json());
 
 const router = express.Router();
 
-router.post("/register", (req, res) => {
-  res.json({ message: "Регистрация прошла" });
-});
 
 
 app.use(router);
