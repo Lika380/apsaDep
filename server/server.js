@@ -1,9 +1,13 @@
 
-
-import dotenv from 'dotenv';
-import path from 'path';
-
 import { fileURLToPath } from 'url';
+import path from 'path';
+import dotenv from 'dotenv';
+
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 console.log('Loaded SMTP config:', {
@@ -27,9 +31,6 @@ import nodemailer from 'nodemailer';
 const app = express();
 const allowedOrigins = ['https://www.apsamarket.ru'];
 
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 
 app.use((req, res, next) => {
