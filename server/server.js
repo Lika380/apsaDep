@@ -11,10 +11,13 @@ import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import path from 'path';
+import cors from 'cors';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 
 const app = express();
+const allowedOrigins = ['https://www.apsamarket.ru'];
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -25,6 +28,19 @@ app.use((req, res, next) => {
   next();
 });
 
+
+app.use(cors({
+  origin: function(origin, callback) {
+    // Если запрос без origin (например, Postman) — разрешить
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.indexOf(origin) === -1) {
+      const msg = `Origin ${origin} не разрешён`;
+      return callback(new Error(msg), false);
+    }
+    return callback(null, true);
+  }
+}));
 
 // ✅ Раздаём статические файлы React
 app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
