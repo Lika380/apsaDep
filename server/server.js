@@ -1721,15 +1721,9 @@ db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
 });
 
 // ✅ Раздаём статические файлы React
-// SPA fallback:
 app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-
-app.use('/product/assets', express.static(path.join(__dirname, '../client/dist/assets')));
-app.use('/product', express.static(path.join(__dirname, '../client/dist')));
-
-// В самом конце
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, '../client/dist', 'index.html');
   if (fs.existsSync(indexPath)) {
@@ -1739,6 +1733,7 @@ app.get('*', (req, res) => {
     res.status(404).send('index.html не найден');
   }
 });
+
 
 // ✅ Запускаем сервер
 const PORT = process.env.PORT || 3001;
