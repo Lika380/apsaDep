@@ -21,6 +21,16 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 
+app.use((req, res, next) => {
+  console.log(`Запрос на: ${req.method} ${req.url}`);
+  next();
+});
+
+
+// ✅ Раздаём статические файлы React
+app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
+app.use(express.static(path.join(__dirname, '../client/dist')));
+
 // теперь можно использовать __dirname
 const clientDistPath = path.join(__dirname, '../client/dist');
 console.log('Путь к фронтенду:', clientDistPath);
@@ -1720,9 +1730,6 @@ db.run(`ALTER TABLE products ADD COLUMN subCategoryId TEXT`, (err) => {
   }
 });
 
-// ✅ Раздаём статические файлы React
-app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
-app.use(express.static(path.join(__dirname, '../client/dist')));
 
 app.get('*', (req, res) => {
   const indexPath = path.join(__dirname, '../client/dist', 'index.html');
