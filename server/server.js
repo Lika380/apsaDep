@@ -1,8 +1,9 @@
 
 
 import dotenv from 'dotenv';
-dotenv.config({ path: path.resolve('./server/.env') });
+import path from 'path';
 
+dotenv.config({ path: path.resolve('./server/.env') });
 
 console.log('Loaded SMTP config:', {
   host: process.env.SMTP_HOST,
@@ -19,7 +20,6 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
-import path from 'path';
 import cors from 'cors';
 import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
