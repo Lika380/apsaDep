@@ -6,7 +6,6 @@ dotenv.config();
 
 import fs from 'fs';
 import express from 'express';
-import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
@@ -45,31 +44,7 @@ if (fs.existsSync(clientDistPath)) {
   console.error('Папка фронтенда не найдена! Проверь структуру проекта и пути.');
 }
 
-// ✅ Сначала включаем CORS
-const allowedOrigins = [
-  'https://apsadep.onrender.com',
-  'https://apsadepserver.onrender.com',
-  'http://localhost:5173', // Vite dev server
-  'http://localhost:3000', // Express dev
-];
 
-const corsOptions = {
-  origin: function (origin, callback) {
-    console.log("🔎 Origin:", origin);
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      console.warn("❌ Запрещённый origin:", origin);
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true,
-};
-
-app.use(cors(corsOptions));
-app.options('*', cors(corsOptions));
 
 app.use(express.json());
 
