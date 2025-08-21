@@ -841,7 +841,7 @@ app.post("/api/admin/projects", async (req, res) => {
 
     stmt.run(id, name, description, image_url || null, function (err) {
       if (err) {
-        console.error(err);
+        console.error('Ошибка БД:', err);
         return res.status(500).json({ error: "Ошибка сервера" });
       }
       res.status(201).json({
@@ -855,7 +855,7 @@ app.post("/api/admin/projects", async (req, res) => {
       });
     });
   } catch (err) {
-    console.error(err);
+    console.error('Ошибка БД:', err);
     res.status(500).json({ error: "Ошибка сервера" });
   }
 });
@@ -1637,7 +1637,7 @@ app.post('/api/subscribe', (req, res) => {
 app.get('/api/subscribers', (req, res) => {
   db.all('SELECT id, email FROM subscribers', (err, rows) => {
     if (err) {
-      console.error(err);
+      console.error('Ошибка БД:', err);
       return res.status(500).json({ error: 'Ошибка сервера' });
     }
     res.json(rows);
@@ -1649,7 +1649,7 @@ app.delete('/api/subscribers/:id', (req, res) => {
   const stmt = db.prepare('DELETE FROM subscribers WHERE id = ?');
   stmt.run(id, function(err) {
     if (err) {
-      console.error(err);
+      console.error('Ошибка БД:', err);
       return res.status(500).json({ error: 'Ошибка при удалении' });
     }
     if (this.changes === 0) {
@@ -1705,7 +1705,7 @@ app.post('/api/messages', (req, res) => {
 process.on('SIGINT', () => {
   db.close((err) => {
     if (err) {
-      console.error(err.message);
+      console.error('Ошибка БД:', err);
     }
     console.log('База данных закрыта.');
     process.exit(0);
