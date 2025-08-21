@@ -1,7 +1,7 @@
 
 
 import dotenv from 'dotenv';
-dotenv.config();
+dotenv.config({ path: path.resolve('./server/.env') });
 
 console.log('JWT_SECRET:', process.env.JWT_SECRET);
 import fs from 'fs';
