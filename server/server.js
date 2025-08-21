@@ -3,8 +3,8 @@
 import dotenv from 'dotenv';
 import path from 'path';
 
-
-dotenv.config({ path: path.resolve(process.cwd(), 'server/.env') });
+import { fileURLToPath } from 'url';
+dotenv.config({ path: path.resolve(__dirname, '.env') });
 
 console.log('Loaded SMTP config:', {
   host: process.env.SMTP_HOST,
@@ -22,7 +22,6 @@ import jwt from 'jsonwebtoken';
 import sqlite3 from 'sqlite3';
 import { v4 as uuidv4 } from 'uuid';
 import cors from 'cors';
-import { fileURLToPath } from 'url';
 import nodemailer from 'nodemailer';
 
 const app = express();
