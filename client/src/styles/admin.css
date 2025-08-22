@@ -129,34 +129,6 @@
     box-shadow: 0 4px 16px rgba(40, 167, 69, 0.4);
 }
 
-.filter-controls {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.filter-select {
-    padding: 8px 15px;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    background: white;
-    color: #495057;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.filter-select:focus {
-    outline: none;
-    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-}
-
-/* Dashboard Styles */
-.dashboard-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 25px;
-}
-
 .dashboard-card {
     background: #fff;
     border: 1px solid #e9ecef;
@@ -218,64 +190,6 @@
     font-size: 16px;
 }
 
-.admin-action-btn {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #007bff;
-    background: transparent;
-    color: #007bff;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: all 0.2s ease;
-    margin-bottom: 10px;
-}
-
-.admin-action-btn:hover {
-    background: #007bff;
-    color: white;
-}
-
-.admin-action-btn:last-child {
-    margin-bottom: 0;
-}
-
-.recent-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid #f9f9fa;
-}
-
-.recent-item:last-child {
-    border-bottom: none;
-}
-
-.status-badge {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.status-badge.pending {
-    background: #fff3cd;
-    color: #856404;
-}
-
-.status-badge.processing {
-    background: #d4edda;
-    color: #155724;
-}
-
-.status-badge.completed {
-    background: #d1ecf1;
-    color: #0c5460;
-}
-
 /* Placeholder Content */
 .placeholder-content {
     text-align: center;
@@ -301,22 +215,6 @@
     line-height: 1.6;
 }
 
-.placeholder-features {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
-    margin-top: 30px;
-}
-
-.feature-item {
-    background: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    color: #495057;
-    font-weight: 500;
-    border-left: 4px solid #28a745;
-}
-
 /* Tables */
 .products-table,
 .users-table {
@@ -330,21 +228,6 @@
 .table-row:last-child {
     border-bottom: none;
     border-radius: 0 0 8px 8px;
-}
-
-
-
-.no-image {
-    width: 60px;
-    height: 60px;
-    background: #f8f9fa;
-    border: 2px solid #e9ecef;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 24px;
-    color: #6c757d;
 }
 
 
@@ -436,26 +319,6 @@
 .user-role.user {
     background: #d1ecf1;
     color: #0c5460;
-}
-
-.user-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-
-.user-status.active {
-    background: #d4edda;
-    color: #155724;
-}
-
-.user-status.inactive {
-    background: #f8d7da;
-    color: #721c24;
 }
 
 /* Messages */
@@ -640,10 +503,6 @@
     .admin-sidebar {
         width: 250px;
     }
-
-    .admin-content {
-       
-    }
     
 .modal-content p {
     font-size: 0.8rem;
@@ -811,19 +670,6 @@
     overflow: hidden;
 }
 
-.table-header {
-    display: grid;
-    grid-template-columns: 80px 2fr 120px 100px 150px 150px;
-    gap: 15px;
-    padding: 15px 20px;
-    background: #0c0c0c;
-    color: white;
-    font-weight: 600;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
 .users-table .table-header {
     grid-template-columns: 60px 1fr 100px 100px 120px 120px;
 }
@@ -879,11 +725,6 @@
     justify-content: center;
     font-size: 24px;
     color: #6c757d;
-}
-
-.product-name {
-    font-weight: 500;
-    color: var(--secondary-color);
 }
 
 
@@ -956,26 +797,6 @@
 .user-role.user {
     background: #d1ecf1;
     color: #0c5460;
-}
-
-.user-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 12px;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    text-align: center;
-}
-
-.user-status.active {
-    background: #d4edda;
-    color: #155724;
-}
-
-.user-status.inactive {
-    background: #f8d7da;
-    color: #721c24;
 }
 
 /* Messages */

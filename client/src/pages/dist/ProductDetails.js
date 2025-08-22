@@ -64,7 +64,6 @@ var ProductDetails = function () {
     var _g = react_1.useState(""), reviewText = _g[0], setReviewText = _g[1];
     var _h = react_1.useState(""), reviewMessage = _h[0], setReviewMessage = _h[1];
     var location = react_router_dom_1.useLocation();
-    var searchParams = new URLSearchParams(location.search);
     var type = ((_a = location.state) === null || _a === void 0 ? void 0 : _a.type) || "products";
     react_1.useEffect(function () {
         (function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -94,7 +93,6 @@ var ProductDetails = function () {
             });
         }); })();
     }, [id, type]);
-    // Загрузка отзывов с использованием api.getReviews
     react_1.useEffect(function () {
         if (!id)
             return;

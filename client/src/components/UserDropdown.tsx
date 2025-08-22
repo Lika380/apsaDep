@@ -13,7 +13,6 @@ export const UserDropdown: React.FC<UserDropdownProps> = ({ userAvatar }) => {
   const { user, logout, isAdmin } = useAuth();
   const navigate = useNavigate();
 
-  // Закрытие дропдауна при клике вне его области
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (

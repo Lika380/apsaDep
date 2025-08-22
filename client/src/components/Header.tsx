@@ -34,9 +34,6 @@ const Header: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [isMobileMenuOpen]);
-  
-
-
 
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 50);
@@ -49,7 +46,6 @@ const Header: React.FC = () => {
     if (searchQuery.trim()) navigate("/catalog");
   };
 
-  // Проверяем текущий путь
   const showSearch =
     location.pathname === "/catalog" || location.pathname === "/cartPage";
 

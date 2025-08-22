@@ -3,11 +3,9 @@ import { useParams, useLocation } from "react-router-dom";
 import { api, tokenUtils } from "../utils/api";
 import "../styles/productDetails.css";
 import { useCart } from "../components/CartContext";
-import cartIcon from "../../public/cart.png";
 import { useAuth } from "../hooks/useAuth";
 import WA from '../images/WA.png';
 import IG from '../images/IG.png';
-import { API_BASE_URL } from "../config";
 
 interface Product {
   id: string;
@@ -25,7 +23,7 @@ interface Product {
 interface Review {
   id: number;
   user_id: number;
-  user_identifier: string; // email или телефон
+  user_identifier: string; 
   text: string;
   created_at: string;
 }
@@ -37,14 +35,12 @@ const ProductDetails: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const { addToCart } = useCart();
   const { user } = useAuth();
-
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loadingReviews, setLoadingReviews] = useState(false);
   const [reviewText, setReviewText] = useState("");
   const [reviewMessage, setReviewMessage] = useState("");
 
   const location = useLocation();
-const searchParams = new URLSearchParams(location.search);
 const type = (location.state as any)?.type || "products";
 
 useEffect(() => {
@@ -62,9 +58,6 @@ useEffect(() => {
   })();
 }, [id, type]);
 
-  
-
-  // Загрузка отзывов с использованием api.getReviews
   useEffect(() => {
     if (!id) return;
     (async () => {
@@ -230,13 +223,9 @@ useEffect(() => {
                   <img src={WA} alt="iconWA" className="cart-icon-wa" />
                 </a>
               )}
-            </div>
-
-            
+            </div>    
           </div>
-          
         </div>
-        
       </div>
       <div className="reviews-section">
               <h3>Отзывы</h3>

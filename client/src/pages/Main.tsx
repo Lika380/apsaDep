@@ -1,5 +1,4 @@
 import React, { useRef, useState, useEffect } from "react";
-import iPhoneMain from '../images/iPhone.png';
 import cartIcon from "../../public/cart.png"
 import '../styles/Main.css';
 import MainProjects from "../components/MainProjects";
@@ -15,15 +14,6 @@ const slides = [
   { img: 'https://i.postimg.cc/6qg77Wwz/Frame_1524.jpg' }
 ];
 
-const cards = [
-  { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: 'hgjhg', btnHeart: iPhoneMain, btnSearch: iPhoneMain, title: 'Ауадхара', p: "120₽" },
-  { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: iPhoneMain, btnHeart: iPhoneMain, btnSearch: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", title: 'Вино "Aчба Иашта"', p: "3400₽" },
-  { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: iPhoneMain, btnHeart: iPhoneMain, btnSearch: iPhoneMain, title: 'MacBook Air ', p: "$65.00 USD" },
-  { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: iPhoneMain, btnHeart: iPhoneMain, btnSearch: iPhoneMain, title: 'Apple Watch Ultra', p: "$65.00 USD" },
-  { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: 'hgjhg', btnHeart: iPhoneMain, btnSearch: iPhoneMain, title: 'Apple AirPods Max', p: "$55.00 USD" },
-  { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: iPhoneMain, btnHeart: iPhoneMain, btnSearch: iPhoneMain, title: 'iPhone 16 ', p: "$65.00 USD" },
-];
-
 const Main: React.FC = () => {
   const { searchQuery } = useSearch();
   const sliderRef = useRef<HTMLDivElement>(null);
@@ -31,7 +21,7 @@ const Main: React.FC = () => {
   const [email, setEmail] = useState('');
   const [subscribeStatus, setSubscribeStatus] = useState<string | null>(null);
 
-  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); // корректный тип
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null); 
 
   const [offers, setOffers] = useState<Record<string, string>>({});
 
@@ -110,23 +100,8 @@ const Main: React.FC = () => {
     type?: string; 
   }>>([]);
 
-  const filterCards = (cardsArray: typeof popularCards) => {
-    if (!searchQuery || !searchQuery.trim()) return cardsArray;
-    const query = searchQuery.toLowerCase();
-    return cardsArray.filter(card =>
-      card.name.toLowerCase().includes(query) ||
-      (card.description && card.description.toLowerCase().includes(query))
-    );
-  };
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-
-const [bakaleya, setBakaleya] = useState<CategoryProduct[]>([]);
-const [milk, setMilk] = useState<CategoryProduct[]>([]);
-const [juices, setJuices] = useState<CategoryProduct[]>([]);
-const [frozen, setFrozen] = useState<CategoryProduct[]>([]);
-const [beauty, setBeauty] = useState<CategoryProduct[]>([]);
 
 const handleSubscribe = async (e: React.FormEvent) => {
   e.preventDefault();
@@ -158,9 +133,6 @@ const handleSubscribe = async (e: React.FormEvent) => {
   }
 };
 
-
-
-//для категории 1
 useEffect(() => {
   setLoading(true);
   fetch(`${API_BASE_URL}/api/category1`)
@@ -305,7 +277,6 @@ useEffect(() => {
   }, []);
 
 
-  // СКРОЛЛ СЛАЙДЕРА
   const handleScroll = () => {
     const slider = sliderRef.current;
     if (!slider) return;
@@ -321,9 +292,6 @@ useEffect(() => {
       if (slider) slider.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-
-  
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -363,7 +331,6 @@ useEffect(() => {
       >
         ◀
       </button>
-      
 
       <div className="slide" style={{ textAlign: 'center' }}>
         <img 
@@ -440,7 +407,6 @@ useEffect(() => {
 </div>
 </section>
 
-
 <section className="main-top-selling-section">
   {/* для category1 */}<div className="top-selling-title">
   <h2>{offers["promo1"]}</h2>
@@ -498,9 +464,7 @@ useEffect(() => {
 
  <section className="main-top-selling-section">
 
-
 {/* для category2 */}
-
 <div className="top-selling-title">
   <h2>{offers["promo2"]}</h2>
   <hr />
@@ -556,7 +520,6 @@ useEffect(() => {
 </div>
 </section>
 <section className="main-top-selling-section">
-
 
   {/* для category3 */}
   <div className="top-selling-title">
@@ -615,7 +578,6 @@ useEffect(() => {
  </section>
  <section className="main-top-selling-section">
 
-
   {/* для category4 */}
   <div className="top-selling-title">
   <h2>{offers["promo4"]}</h2>
@@ -673,7 +635,6 @@ useEffect(() => {
 </div>
  </section>
  <section className="main-top-selling-section">
-
 
   {/* для category5 */}
   <div className="top-selling-title">

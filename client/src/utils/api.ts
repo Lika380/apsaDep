@@ -77,18 +77,16 @@ export interface Category5 {
 }
 
 export interface CategoryProduct {
-  id: string;          // или number, как у тебя в БД
-  name: string;        // название товара
-  description?: string; // описание (необязательно)
-  price: number;       // цена
-  category: string;    // категория (bakaleya, milk и т.д.)
-  image_url?: string;  // ссылка на картинку
+  id: string;       
+  name: string;      
+  description?: string; 
+  price: number;      
+  category: string;  
+  image_url?: string; 
   stock_quantity?: number;
   subcategory?: string;
 }
 
-
-// Утилиты для работы с токенами
 export const tokenUtils = {
   getToken: (): string | null => {
     return localStorage.getItem('authToken');
@@ -115,7 +113,7 @@ export const tokenUtils = {
   }
 };
 
-// Утилита для API запросов с автоматическим добавлением токена
+
 export const apiRequest = async (endpoint: string, options: RequestInit = {}) => {
   const token = tokenUtils.getToken();
 
@@ -130,32 +128,26 @@ export const apiRequest = async (endpoint: string, options: RequestInit = {}) =>
 
   const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
 
-  // Проверка на истекший токен
   if (response.status === 401) {
     tokenUtils.removeToken();
     window.location.href = '/';
     throw new Error('Недействительный токен');
   }
 
-  // Пробуем распарсить ответ
   let data;
   try {
     data = await response.json();
   } catch {
     throw new Error('Ошибка разбора JSON ответа');
   }
-
-  // Если ошибка — выбрасываем её
   if (!response.ok) {
     throw new Error(data?.message || `Ошибка: ${response.status}`);
   }
 
-  return data; // уже распарсенный JSON
+  return data;
 };
 
-// API функции
 export const api = {
-
 
   getReviews: async (productId: string) => {
     return await apiRequest(`/api/reviews?productId=${encodeURIComponent(productId)}`);
@@ -167,7 +159,7 @@ export const api = {
       throw new Error('Ошибка загрузки main offers');
     }
     const data = await res.json();
-    // Предположим, что API возвращает массив вида [{ id: "promo1", text: "Заголовок 1" }, ...]
+   
     const offersObj: Record<string, string> = {};
     data.forEach((item: { id: string; text: string }) => {
       offersObj[item.id] = item.text;
@@ -175,7 +167,6 @@ export const api = {
     return offersObj;
   },
   
-  // Аутентификация
   login: async (email: string | null, phone: string | null, password: string) => {
     console.log('register payload:', { email, phone, password });
 
@@ -196,9 +187,6 @@ export const api = {
     });
     return response.json();
   },
-  
-
-  // Товары
 
   getProduct: async (id: string) => {
     const data = await apiRequest(`/api/products/${id}`);
@@ -260,13 +248,11 @@ export const api = {
     return await apiRequest(endpoint);
   },
   
-  // Категории
   getCategories: async () => {
     const data = await apiRequest('/api/categories');
     return data;
   },
 
-  // Корзина
   getCart: async () => {
     const data = await apiRequest('/api/cart');
     return data;
@@ -295,7 +281,6 @@ export const api = {
     return data;
   },
 
-  // Административные функции
   admin: {
     getUsers: async () => {
       const data = await apiRequest('/api/admin/users');
@@ -374,7 +359,6 @@ export const api = {
       return await res.json();
     },
     
-    
     updatePopular: async (id: string, popularData: Popular) => {
       const res = await fetch(`${API_BASE_URL}/api/popular/${id}`, {
         method: "PUT",
@@ -404,7 +388,6 @@ export const api = {
       const res = await fetch(`${API_BASE_URL}/api/popular`);
       return await res.json();
     },
-  //для категории 1
     
     createCategory1: async (category1Data: Omit<Category1, "id">) => {
       const res = await fetch(`${API_BASE_URL}/api/category1`, {
@@ -418,7 +401,6 @@ export const api = {
       
       return await res.json();
     },
-    
     
     updateCategory1: async (id: string, category1Data: Category1) => {
       const res = await fetch(`${API_BASE_URL}/api/category1/${id}`, {
@@ -448,8 +430,6 @@ export const api = {
       const res = await fetch(`${API_BASE_URL}/api/category1`);
       return await res.json();
     },
-  
-    //для категории 2
     
     createCategory2: async (category2Data: Omit<Category2, "id">) => {
       const res = await fetch(`${API_BASE_URL}/api/category2`, {
@@ -464,7 +444,6 @@ export const api = {
       return await res.json();
     },
     
-    
     updateCategory2: async (id: string, сategory1Data: Category2) => {
       const res = await fetch(`${API_BASE_URL}/api/category2/${id}`, {
         method: "PUT",
@@ -476,7 +455,6 @@ export const api = {
       });
       return await res.json();
     },
-    
     
     deleteCategory2: async (id: string) => {
       const res = await fetch(`${API_BASE_URL}/api/category2/${id}`, {
@@ -493,8 +471,6 @@ export const api = {
       const res = await fetch(`${API_BASE_URL}/api/category2`);
       return await res.json();
     },
-  
-     //для категории 3
     
      createCategory3: async (category3Data: Omit<Category3, "id">) => {
       const res = await fetch(`${API_BASE_URL}/api/category3`, {
@@ -509,7 +485,6 @@ export const api = {
       return await res.json();
     },
     
-    
     updateCategory3: async (id: string, сategory3Data: Category3) => {
       const res = await fetch(`${API_BASE_URL}/api/category3/${id}`, {
         method: "PUT",
@@ -522,7 +497,6 @@ export const api = {
       return await res.json();
     },
     
-    
     deleteCategory3: async (id: string) => {
       const res = await fetch(`${API_BASE_URL}/api/category3/${id}`, {
         method: "DELETE",
@@ -533,13 +507,10 @@ export const api = {
       return await res.json();
     },
     
-    
     getCategory3: async () => {
       const res = await fetch(`${API_BASE_URL}/api/category3`);
       return await res.json();
     },
-  
-     //для категории 4
     
      createCategory4: async (category4Data: Omit<Category4, "id">) => {
       const res = await fetch(`${API_BASE_URL}/api/category4`, {
@@ -554,7 +525,6 @@ export const api = {
       return await res.json();
     },
     
-    
     updateCategory4: async (id: string, сategory4Data: Category4) => {
       const res = await fetch(`${API_BASE_URL}/api/category4/${id}`, {
         method: "PUT",
@@ -567,7 +537,6 @@ export const api = {
       return await res.json();
     },
     
-    
     deleteCategory4: async (id: string) => {
       const res = await fetch(`${API_BASE_URL}/api/category4/${id}`, {
         method: "DELETE",
@@ -578,13 +547,10 @@ export const api = {
       return await res.json();
     },
     
-    
     getCategory4: async () => {
       const res = await fetch(`${API_BASE_URL}/api/category4`);
       return await res.json();
     },
-  
-     //для категории 5
     
      createCategory5: async (category5Data: Omit<Category5, "id">) => {
       const res = await fetch(`${API_BASE_URL}/api/category5`, {
@@ -599,7 +565,6 @@ export const api = {
       return await res.json();
     },
     
-    
     updateCategory5: async (id: string, сategory5Data: Category5) => {
       const res = await fetch(`${API_BASE_URL}/api/category5/${id}`, {
         method: "PUT",
@@ -612,7 +577,6 @@ export const api = {
       return await res.json();
     },
     
-    
     deleteCategory5: async (id: string) => {
       const res = await fetch(`${API_BASE_URL}/api/category5/${id}`, {
         method: "DELETE",
@@ -623,7 +587,6 @@ export const api = {
       return await res.json();
     },
     
-    
     getCategory5: async () => {
       const res = await fetch(`${API_BASE_URL}/api/category5`);
       return await res.json();
@@ -632,7 +595,6 @@ export const api = {
   },
   
 };
-
 
 export async function getProducts({
   category_id,

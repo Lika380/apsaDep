@@ -11,8 +11,6 @@ import Category4Admin from "./category4";
 import Category5Admin from "./category5";
 import { productData } from "../components/product/productData";
 import { categoriesList } from "../components/product/productData";
-import { categoryMapping } from "../components/product/productData";
-import { subCategories } from "../components/product/productData";
 import { API_BASE_URL } from "../config";
 
 
@@ -28,7 +26,7 @@ interface Product {
   subcategory?: string; 
   instagram?: string;
   whatsapp?: string;
-  website?: string; // если нужно
+  website?: string;
   mainCategory?: string;
   subCategory?: string;
   subCategoryId?: string; 
@@ -56,7 +54,6 @@ interface TabType {
   icon: string;
   subCategoryId?: string; 
 }
-
 
 const tabs: TabType[] = [
   { id: "dashboard", name: "Dashboard", icon: "📊" },
@@ -104,7 +101,7 @@ const categoryMap: Record<string, number> = {
     show: boolean;
     onClose: () => void;
     onSave: (product: AddProductData) => void;
-    categories: { id: string; name: string; icon: string }[];  // категории с id:string
+    categories: { id: string; name: string; icon: string }[]; 
   }
   
   const AddProductModal: React.FC<AddProductModalProps> = ({ show, onClose, onSave, categories }) => {
@@ -128,14 +125,12 @@ const categoryMap: Record<string, number> = {
     const handleSubmit = (e: React.FormEvent) => {
       e.preventDefault();
     
-      // Находим main категорию
       const mainCat = productData.find((m) => m.title === formData.mainCategory);
       if (!mainCat) {
         alert("Выберите основную категорию");
         return;
       }
     
-      // Находим подкатегорию внутри main
       const subCat = mainCat.items.find((i) => i.title2 === formData.subCategory);
       if (!subCat) {
         alert("Выберите подкатегорию");
@@ -145,12 +140,9 @@ const categoryMap: Record<string, number> = {
       const category_id = mainCat.category_id.toString();
       const subCategoryId = subCat.subCategoryId.toString();
     
-      // Отправляем в onSave все нужные данные, включая subCategoryId
       onSave({ ...formData, category_id, subCategoryId });
-    
       onClose();
     
-      // Очистка формы
       setFormData({
         name: '',
         description: '',
@@ -163,7 +155,7 @@ const categoryMap: Record<string, number> = {
         category_id: '',
         mainCategory: '',
         subCategory: '',
-        subCategoryId: '',  // добавь если нужно
+        subCategoryId: '',  
       });
     };
     
@@ -177,7 +169,6 @@ const categoryMap: Record<string, number> = {
             <button className="modal-close" onClick={onClose}>×</button>
           </div>
           <form onSubmit={handleSubmit} className="modal-form">
-            {/* Существующие поля */}
             <div className="form-group">
               <label>Название товара:</label>
               <input
@@ -222,8 +213,7 @@ const categoryMap: Record<string, number> = {
                 required
               />
             </div>
-  
-            {/* Новые поля */}
+
             <div className="form-group">
               <label>Веб-сайт:</label>
               <input
@@ -252,7 +242,6 @@ const categoryMap: Record<string, number> = {
               />
             </div>
   
-   {/* Основная категория */}
    <div className="form-group">
               <label>Основная категория:</label>
               <select
@@ -274,8 +263,7 @@ const categoryMap: Record<string, number> = {
                 ))}
               </select>
             </div>
-  
-           {/* Подкатегория */}
+
 {formData.mainCategory && (
   <div className="form-group">
     <label>Подкатегория:</label>
@@ -320,10 +308,6 @@ const categoryMap: Record<string, number> = {
     );
   };
 
-
-
-  
-
 interface EditProductModalProps {
   show: boolean;
   product: Product | null;
@@ -356,33 +340,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     subCategory: "",
   });
   
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-  
-    const mainCat = productData.find((m) => m.title === formData.mainCategory);
-    if (!mainCat) {
-      alert("Выберите основную категорию");
-      return;
-    }
-  
-    const subCat = mainCat.items.find((i) => i.title2 === formData.subCategory);
-    if (!subCat) {
-      alert("Выберите подкатегорию");
-      return;
-    }
-    const category_id = mainCat.category_id.toString();
-    const subCategoryId = subCat.subCategoryId.toString();
-    
-    const updatedProduct: Product = {
-      ...formData,
-      category_id,
-      subCategoryId,  // добавь, если нужен
-      id: product?.id || '',
-    };
-    
-    onSave(updatedProduct);
-    onClose();
-  };  
   
   useEffect(() => {
     if (product) {
@@ -420,8 +377,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
     onSave(updatedProduct);
     onClose();
   };
-  
-
 
   if (!show || !product) return null;
 
@@ -562,8 +517,6 @@ const EditProductModal: React.FC<EditProductModalProps> = ({
   );
 };
 
-
-
   
 export const AdminPanel: React.FC = () => {
   const { user } = useAuth();
@@ -576,20 +529,17 @@ export const AdminPanel: React.FC = () => {
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
-  //для названии блоков с товарами в main.tsx
   const [offers, setOffers] = useState<Record<string, string>>({});
-
 
   const [categoryProducts, setCategoryProducts] = useState<Product[]>([]);
   const [loadingCategoryProducts, setLoadingCategoryProducts] = useState(false);
   const [errorCategoryProducts, setErrorCategoryProducts] = useState<string | null>(null);
 
-//для подписки в разделе [хотите стать спонсором ]
   const [subscribers, setSubscribers] = useState<{id: number; email: string}[]>([]);
 const [loadingSubscribers, setLoadingSubscribers] = useState(false);
 const productCategories = tabs.filter(tab => tab.id.startsWith("category"));
 
-//для формы обратной связи в контактах 
+
 const [messages, setMessages] = useState<
   { id: number; name: string; email: string; subject?: string; message: string; created_at: string }[]
 >([]);
@@ -631,8 +581,6 @@ const handleDeleteMessage = async (id: number) => {
   }
 };
 
-
-//для подписки в разделе [хотите стать спонсором ]
 const loadSubscribers = async () => {
   setLoadingSubscribers(true);
   try {
@@ -661,7 +609,6 @@ const handleDeleteSubscriber = async (id: number) => {
     if (!res.ok) {
       throw new Error('Ошибка удаления подписчика');
     }
-    // После удаления обновляем список подписчиков
     setSubscribers(prev => prev.filter(sub => sub.id !== id));
   } catch (err) {
     console.error(err);
@@ -792,7 +739,6 @@ const handleDeleteSubscriber = async (id: number) => {
       loadProducts();
     }
   }, [activeTab]);
-
   
 
   const renderDashboard = () => {
@@ -818,7 +764,6 @@ const handleDeleteSubscriber = async (id: number) => {
 
   </div>
   
-          {/* Редактирование предложений */}
           <div className="dashboard-card">
             <div className="card-header">
               <h3>Редактирование предложений для главной</h3>
@@ -1079,7 +1024,6 @@ const handleDeleteSubscriber = async (id: number) => {
         <main className="admin-main">{renderContent()}</main>
       </div>
   
-      {/* Модальные окна */}
       <AddProductModal
   show={showAddProduct}
   onClose={() => setShowAddProduct(false)}

@@ -19,16 +19,6 @@
   .slide {
     width: 100%;
   }
-
-  .main-slider-switch-btn {
-    width: 11px;
-    height: 11px;
-    background: #000;
-    border-radius: 50%;
-    border: none;
-    cursor: pointer;
-    margin-top: -0.2%;
-  }
   
   .main-top-selling-section {
     display: flex;
@@ -36,9 +26,6 @@
     margin: 0 auto;
     width: 100%;
   }
-
-
-     /*для популярных */
 
   .main-popular-section {
     display: flex;
@@ -246,13 +233,6 @@
     position: relative; /* важно */
     overflow: hidden; 
   }
-  .main-top-selling-block-info {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 30%;
-  }
 
 
 .main-top-selling-card-img-div {
@@ -367,14 +347,6 @@
   color: #4d514b;
 }
 
-.macEssentialsCards {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  color: #4d514b;
-}
-
 .macAccessoriesBlock,
 .macBlock {
   width: 47%;
@@ -392,19 +364,6 @@
   width: 90%;
 }
 
-.read-more {
-background: none;
-border: none;
-width: 90%;
-margin: 0 auto;
-display: flex;
-justify-content: end;
-margin-top: 5%;
-font-size: 15px;
-color: #4d514b;
-font-weight: 600;
-}
-
 .macAccessoriesBlock h4,
 .macBlock h4 {
   padding: 10% 0 2% 0;
@@ -415,70 +374,8 @@ font-weight: 600;
   font-size: 14px;
 }
 
-.left-triangle {
-  width: 0;
-  height: 0;
-  border-top: 10px solid transparent;
-  border-bottom: 10px solid transparent;
-  border-right: 10px solid #000; /* цвет треугольника */
-}
-
-
-.iMacAccessories {
-  width: 60%;
-}
-
-.buyMacAccessoriesButton {
-  border: none;
-  padding-top: 2%;
-  color: rgb(108, 108, 174);
-  display: flex;
-  font-size: 15px;
-}
-.popular-categories {
-  width: 90%;
-  margin: 0 auto;
-  padding-bottom: 10%;
-}
-
-.popular-categories-img {
-  width: 80%;
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
-.categories-slider-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-  overflow: hidden;
-  margin-top: 20px;
-}
-
-.main-popular-categories-cards {
-  display: flex;
-  overflow-x: auto;
-  scroll-behavior: smooth;
-  gap: 5%;
-  padding: 10px;
-  scrollbar-width: none;
-}
-
 .main-popular-categories-cards::-webkit-scrollbar {
   display: none;
-}
-
-.main-popular-categories-card {
-  min-width: 20px;
-  flex-shrink: 0;
-  width: 17%;
-  display: flex;
-  flex-direction: column;
-  justify-content: end;
-  align-items: center;
-  gap: 7%;
 }
 
 .main-sliderBtn {
@@ -506,25 +403,6 @@ font-weight: 600;
 
 .main-sliderBtn-right {
   margin-right: -10%;
-}
-
-.slider-btn {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  border: 1px solid #ccc;
-  cursor: pointer;
-  font-size: 18px;
-  transition: opacity 0.3s;
-  width: 4%;
-  background: rgba(34, 34, 34, 0.2);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 1% 0;
-  border: none;
-  border-radius: 50%;
 }
 
 .slider-btn.left {
@@ -646,17 +524,6 @@ font-weight: 600;
   background-color: #35372b;
 }
 
-.main-newsletter-success {
-  color: #ffffff;
-  font-size: 0.85rem;
-  margin-top: 8px;
-}
-
-.mainProjects-block {
-  width: 95%;
-  margin: 0 auto;
-  margin-top: 7%;
-}
 
 .main-newsletter-error {
   color: #e74c3c;
@@ -676,11 +543,6 @@ height: 250px;
 }
 
 .main-form-group {
-  width: 100%;
-}
-
-.submit-policy {
-  font-size: 11px;
   width: 100%;
 }
 
@@ -718,10 +580,6 @@ height: 250px;
   font-size: 19px;
   transition: 0.3s;
 }
-
-
-
-
 
 @media (max-width: 2800px) {
 
@@ -867,9 +725,6 @@ height: 250px;
     }
 }
 
-
-
-
 @media (max-width: 1800px) {
   
 
@@ -887,11 +742,7 @@ height: 250px;
     .main-newsletter-input {
       font-size: 1rem;
     }
-
-
 }
-
-
 
 @media (max-width: 1500px) {
   .slider-container {
@@ -1010,10 +861,6 @@ font-size: 0.9rem;
   .popular-title h2 {
     font-size: 1.3rem;
   }
-  
-
-  
-  
     .top-selling-title h2 {
       font-size: 1.3rem;
     }
@@ -1211,7 +1058,6 @@ font-size: 1.3rem;
     }
     
 }
-
 
 @media (max-width: 480px) {
   .main-submit-promotions-content {

@@ -34,7 +34,6 @@ export default function HomePage() {
     const category_id = categoryMapping[categoryTitle];
     setSelectedCategory(category_id?.toString() || "all");
     setSelectedSubcategory(subCategoryId);
-    // автоматически закрываем сайдбар на мобильных после выбора
     setIsSidebarOpen(false);
   };
 
@@ -50,7 +49,6 @@ export default function HomePage() {
     return categoryName || "Товары";
   };
 
-  // закрываем при клике вне (для мобильных)
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (
@@ -68,7 +66,6 @@ export default function HomePage() {
   return (
     <div className="homePage">
       <div className="catalog-container">
-        {/* Бургер и сайдбар */}
         <div className="mobile-sidebar-toggle">
           <button
             aria-label="Открыть каталог"

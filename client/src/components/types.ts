@@ -1,4 +1,4 @@
-// types.ts
+
 export type CartItem = {
   id: string;
   name: string;

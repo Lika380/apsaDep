@@ -25,7 +25,7 @@ export const RegisterModal: React.FC<Props> = ({
   e.preventDefault();
 
   try {
-    const data = await api.register(email, phone, password, name); // ← добавил const data =
+    const data = await api.register(email, phone, password, name); 
 
     if (data.message === "Пользователь успешно создан") {
       setMessage("Регистрация успешна!");
@@ -42,7 +42,6 @@ export const RegisterModal: React.FC<Props> = ({
   }
 };
 
-  // И в форме добавить input для email и/или phone
   <input
     type="email"
     placeholder="Email"

@@ -3,10 +3,8 @@ import { fileURLToPath } from 'url';
 import path from 'path';
 import dotenv from 'dotenv';
 
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
@@ -29,21 +27,21 @@ import cors from 'cors';
 import nodemailer from 'nodemailer';
 
 const app = express();
-const allowedOrigins = ['https://www.apsamarket.ru'];
+const allowedOrigins = [
+  'https://www.apsamarket.ru',
+  'http://localhost:5173', 
+];
 
-
+app.use(cors());
 
 app.use((req, res, next) => {
   console.log(`Запрос на: ${req.method} ${req.url}`);
   next();
 });
 
-
 app.use(cors({
   origin: function(origin, callback) {
-    // Если запрос без origin (например, Postman) — разрешить
     if (!origin) return callback(null, true);
-
     if (allowedOrigins.indexOf(origin) === -1) {
       const msg = `Origin ${origin} не разрешён`;
       return callback(new Error(msg), false);
@@ -52,11 +50,9 @@ app.use(cors({
   }
 }));
 
-// ✅ Раздаём статические файлы React
 app.use('/assets', express.static(path.join(__dirname, '../client/dist/assets')));
 app.use(express.static(path.join(__dirname, '../client/dist')));
 
-// теперь можно использовать __dirname
 const clientDistPath = path.join(__dirname, '../client/dist');
 console.log('Путь к фронтенду:', clientDistPath);
 console.log('Папка фронтенда существует?', fs.existsSync(clientDistPath));
@@ -70,17 +66,8 @@ if (fs.existsSync(clientDistPath)) {
   console.error('Папка фронтенда не найдена! Проверь структуру проекта и пути.');
 }
 
-
-
 app.use(express.json());
-
-
-
-
 const router = express.Router();
-
-
-
 app.use(router);
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -89,20 +76,10 @@ if (!JWT_SECRET) {
   process.exit(1);
 }
 
-// Обработка preflight-запросов
-
-
 function formatDateForSQLite(date) {
   return date.toISOString().replace('T', ' ').substring(0, 19);
 }
 
-
-//для почты 
-const smtpUser = process.env.SMTP_USER;
-const smtpPass = process.env.SMTP_PASS;
-
-
-// Инициализация базы данных
 const db = new sqlite3.Database('./new_database.db');
 
 const categoriesData = [
@@ -115,9 +92,7 @@ const categoriesData = [
 ];
 
 
-// Создание таблиц
 db.serialize(() => {
-//для названиии категории 
 db.run(`CREATE TABLE IF NOT EXISTS categories (
   id INTEGER PRIMARY KEY,
   name TEXT NOT NULL,
@@ -136,8 +111,6 @@ categoriesData.forEach(([id, name, parent_id]) => {
     }
   );
 });
-
-  
 
   db.run(`
     CREATE TABLE IF NOT EXISTS popular (
@@ -239,9 +212,6 @@ categoriesData.forEach(([id, name, parent_id]) => {
     )
   `);
   
-
-
-  // Таблица товаров
   db.run(`CREATE TABLE IF NOT EXISTS products (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
@@ -256,7 +226,6 @@ categoriesData.forEach(([id, name, parent_id]) => {
     FOREIGN KEY (subCategoryId) REFERENCES categories (id)
   )`);
 
-  // Таблица корзины
   db.run(`CREATE TABLE IF NOT EXISTS cart_items (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER,
@@ -276,13 +245,8 @@ categoriesData.forEach(([id, name, parent_id]) => {
     FOREIGN KEY (user_id) REFERENCES users(id)
   );`);
   
-  
-
-  // Создание администратора по умолчанию
   const adminPassword = bcrypt.hashSync('admin123', 10);
   db.run(`INSERT OR IGNORE INTO users (email, phone, password, role) VALUES (?, ?, ?, ?)`, ['admin@example.com', null, adminPassword, 'admin']);
-
-
 
   db.run(`INSERT OR IGNORE INTO categories (id, name) VALUES 
     (1, 'Телевизоры и цифровое ТВ'),
@@ -304,7 +268,6 @@ categoriesData.forEach(([id, name, parent_id]) => {
 
 });
 
-// Middleware для проверки JWT токена
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   const token = authHeader && authHeader.split(' ')[1];
@@ -322,7 +285,6 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Маршруты аутентификации
 app.post('/register', async (req, res) => {
   const { email, phone, password } = req.body;
 
@@ -331,7 +293,6 @@ app.post('/register', async (req, res) => {
   }
 
   try {
-    // Проверяем, есть ли пользователь с таким email
     db.get('SELECT * FROM users WHERE email = ?', [email], async (err, existingUser) => {
       if (err) return res.status(500).json({ message: 'Ошибка базы данных' });
 
@@ -339,12 +300,11 @@ app.post('/register', async (req, res) => {
         if (existingUser.is_verified) {
           return res.status(400).json({ message: 'Пользователь уже зарегистрирован и подтверждён' });
         } else {
-          // Пользователь есть, но не подтверждён — удаляем старые токены и отправляем новое письмо
           db.run('DELETE FROM email_verifications WHERE user_id = ?', [existingUser.id], (err) => {
             if (err) return res.status(500).json({ message: 'Ошибка удаления старых токенов' });
 
             const token = uuidv4();
-            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();// 1 час
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
             db.run(
               'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
@@ -363,7 +323,6 @@ app.post('/register', async (req, res) => {
           });
         }
       } else {
-        // Новый пользователь — создаём
         const hashedPassword = await bcrypt.hash(password, 10);
         db.run(
           'INSERT INTO users (email, phone, password, role, is_verified) VALUES (?, ?, ?, ?, ?)',
@@ -375,7 +334,7 @@ app.post('/register', async (req, res) => {
 
             const userId = this.lastID;
             const token = uuidv4();
-            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString(); // 1 час
+            const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
             db.run(
               'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
@@ -400,7 +359,6 @@ app.post('/register', async (req, res) => {
   }
 });
 
-
 app.get('/api/verify-email', (req, res) => {
   const { token } = req.query;
   if (!token) return res.status(400).send('Токен не указан');
@@ -409,7 +367,7 @@ app.get('/api/verify-email', (req, res) => {
     if (err || !row) return res.status(400).send('Неверный токен');
 
     const now = new Date();
-    const expiresAt = new Date(row.expires_at.replace(' ', 'T')); // 👈 фикс даты
+    const expiresAt = new Date(row.expires_at.replace(' ', 'T')); 
 
     if (expiresAt < now) {
       return res.status(400).send('Токен просрочен');
@@ -420,10 +378,6 @@ app.get('/api/verify-email', (req, res) => {
     res.send('Email подтвержден. Теперь вы можете войти.');
   });
 });
-
-
-
-
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST,            // ✅ smtp.gmail.com
@@ -472,11 +426,6 @@ async function sendVerificationEmail(email, token) {
   }
 }
  
-
-
-
-
-
 app.post('/login', (req, res) => {
   const { email, password } = req.body;
 
@@ -496,16 +445,12 @@ app.post('/login', (req, res) => {
       return res.status(401).json({ message: 'Неверные учетные данные' });
     }
 
-    // 🛑 Если не подтверждён — отправить новое письмо
     if (!user.is_verified && user.role !== 'admin') {
       const token = uuidv4();
       const expiresAt = new Date(Date.now() + 60 * 60 * 1000).toISOString();
 
-      // Удалить старые токены
       db.run('DELETE FROM email_verifications WHERE user_id = ?', [user.id], (err) => {
         if (err) return res.status(500).json({ message: 'Ошибка очистки старых токенов' });
-
-        // Вставить новый токен
         db.run(
           'INSERT INTO email_verifications (user_id, token, expires_at) VALUES (?, ?, ?)',
           [user.id, token, expiresAt],
@@ -521,11 +466,9 @@ app.post('/login', (req, res) => {
           }
         );
       });
-
-      return; // Важно: остановить выполнение здесь
+      return; 
     }
 
-    // ✅ Всё хорошо — возвращаем JWT
     const token = jwt.sign(
       { id: user.id, email: user.email, role: user.role },
       JWT_SECRET,
@@ -539,8 +482,6 @@ app.post('/login', (req, res) => {
     });
   });
 });
-
-
 
 app.post('/api/reviews', authenticateToken, (req, res) => {
   const { text, productId } = req.body;
@@ -561,10 +502,8 @@ app.post('/api/reviews', authenticateToken, (req, res) => {
   });
 });
 
-
 app.get('/api/reviews', (req, res) => {
   const { productId } = req.query;
-
   let sql = `
     SELECT reviews.id, reviews.text, reviews.created_at, users.email, users.phone
     FROM reviews
@@ -572,14 +511,12 @@ app.get('/api/reviews', (req, res) => {
   `;
 
   const params = [];
-
   if (productId) {
     sql += ' WHERE reviews.productId = ?';
     params.push(productId);
   }
 
   sql += ' ORDER BY reviews.created_at DESC';
-
   db.all(sql, params, (err, rows) => {
     if (err) {
       return res.status(500).json({ message: 'Ошибка получения отзывов' });
@@ -595,8 +532,6 @@ app.get('/api/reviews', (req, res) => {
   });
 });
 
-
-// Удаление отзыва (только для админа)
 app.delete('/api/reviews/:id', authenticateToken, (req, res) => {
   const reviewId = req.params.id;
 
@@ -615,8 +550,6 @@ app.delete('/api/reviews/:id', authenticateToken, (req, res) => {
   });
 });
 
-
-// Админ: получить всех пользователей
 app.get('/api/admin/users', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
@@ -625,8 +558,6 @@ app.get('/api/admin/users', authenticateToken, (req, res) => {
     res.json(users);
   });
 });
-
-
 
 app.get('/api/products/category/:category_id', (req, res) => {
   const category_id = Number(req.params.category_id);
@@ -648,24 +579,18 @@ app.get('/api/products/category/:category_id', (req, res) => {
       fetchNext();
     });
   };
-
   fetchNext();
 });
 
 app.get('/api/products/by-category/:id', (req, res) => {
   const category_id = parseInt(req.params.id);
-
-  // Получаем все подкатегории + саму категорию
   const getSubcategories = `
     SELECT id FROM categories WHERE id = ? OR parent_id = ?
   `;
 
   db.all(getSubcategories, [category_id, category_id], (err, rows) => {
     if (err) return res.status(500).json({ message: 'Ошибка получения подкатегорий' });
-
     const category_ids = rows.map(row => row.id);
-
-    // Получаем все товары по этим категориям
     const placeholders = category_ids.map(() => '?').join(',');
     const getProducts = `SELECT * FROM products WHERE category_id IN (${placeholders})`;
 
@@ -684,7 +609,6 @@ app.get('/api/subcategory/:id', (req, res) => {
     res.json(rows);
   });
 });
- 
 
 app.get('/api/products', (req, res) => {
   const { subCategoryId, category_id } = req.query;
@@ -696,7 +620,6 @@ app.get('/api/products', (req, res) => {
     query += ' AND category_id = ?';
     params.push(category_id);
   }
-
   if (subCategoryId) {
     query += ' AND subCategoryId = ?';
     params.push(subCategoryId);
@@ -724,7 +647,6 @@ app.get('/api/products/:id', (req, res) => {
   });
 });
 
-
 app.get('/api/catalog/product/:id', (req, res) => {
   const id = req.params.id;
   const tables = ['popular', 'category1', 'category2', 'category3', 'category4', 'category5'];
@@ -743,11 +665,9 @@ app.get('/api/catalog/product/:id', (req, res) => {
       tryNextTable();
     });
   }
-
   tryNextTable();
 });
 
-// Маршруты для категорий
 app.get('/api/categories', (req, res) => {
   db.all('SELECT * FROM categories', (err, categories) => {
     if (err) {
@@ -757,7 +677,6 @@ app.get('/api/categories', (req, res) => {
   });
 });
 
-// Маршруты корзины (требуют авторизации)
 app.get('/api/cart', authenticateToken, (req, res) => {
   const userId = req.user.id;
   
@@ -776,7 +695,6 @@ app.post('/api/cart', authenticateToken, (req, res) => {
   const userId = req.user.id;
   const { product_id, quantity = 1 } = req.body;
 
-  // Проверка существования товара
   db.get('SELECT * FROM products WHERE id = ?', [product_id], (err, product) => {
     if (err) {
       return res.status(500).json({ message: 'Ошибка базы данных' });
@@ -785,7 +703,6 @@ app.post('/api/cart', authenticateToken, (req, res) => {
       return res.status(404).json({ message: 'Товар не найден' });
     }
 
-    // Проверка, есть ли уже товар в корзине
     db.get('SELECT * FROM cart_items WHERE user_id = ? AND product_id = ?', 
       [userId, product_id], (err, existingItem) => {
         if (err) {
@@ -793,7 +710,6 @@ app.post('/api/cart', authenticateToken, (req, res) => {
         }
 
         if (existingItem) {
-          // Обновляем количество
           db.run('UPDATE cart_items SET quantity = quantity + ? WHERE user_id = ? AND product_id = ?',
             [quantity, userId, product_id], (err) => {
               if (err) {
@@ -802,7 +718,6 @@ app.post('/api/cart', authenticateToken, (req, res) => {
               res.json({ message: 'Количество товара обновлено в корзине' });
             });
         } else {
-          // Добавляем новый товар
           db.run('INSERT INTO cart_items (user_id, product_id, quantity) VALUES (?, ?, ?)',
             [userId, product_id, quantity], (err) => {
               if (err) {
@@ -814,7 +729,6 @@ app.post('/api/cart', authenticateToken, (req, res) => {
       });
   });
 });
-
 
 app.get('/api/projects', (req, res) => {
   db.all('SELECT * FROM projects ORDER BY ROWID DESC', (err, rows) => {
@@ -835,7 +749,6 @@ app.get('/api/projects/latest', (req, res) => {
   });
 });
 
-
 app.post("/api/admin/projects", async (req, res) => {
   const { name, description, image_url } = req.body;
 
@@ -847,9 +760,7 @@ app.post("/api/admin/projects", async (req, res) => {
     const stmt = db.prepare(
       "INSERT INTO projects (id, name, description, image_url) VALUES (?, ?, ?, ?)"
     );
-
     const id = uuidv4();
-
     stmt.run(id, name, description, image_url || null, function (err) {
       if (err) {
         console.error('Ошибка БД:', err);
@@ -871,8 +782,6 @@ app.post("/api/admin/projects", async (req, res) => {
   }
 });
 
-
-//для категории 1
 app.get('/api/category1', (req, res) => {
   console.log('Запрос /api/category1 получен');
   db.all('SELECT * FROM category1', (err, rows) => {
@@ -893,15 +802,11 @@ app.get('/api/category1/:id', (req, res) => {
   });
 });
 
-
-
 app.post('/api/category1', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
 
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4(); 
   const sql = `INSERT INTO category1 (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -909,18 +814,14 @@ app.post('/api/category1', (req, res) => {
       console.error('Ошибка при добавлении в category1:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление продукта
 app.put('/api/category1/:id', (req, res) => {
   const id = req.params.id;
   console.log('PUT /api/category1/:id', id, 'body:', req.body);
-
   const { name, description, price, category_id, image_url } = req.body;
-
   const sql = `
     UPDATE category1
     SET name = ?, description = ?, price = ?, category_id = ?, image_url = ?
@@ -940,13 +841,9 @@ app.put('/api/category1/:id', (req, res) => {
   });
 });
 
-
-// Удаление продукта
 app.delete('/api/category1/:id', (req, res) => {
   const id = req.params.id;
-
   const sql = `DELETE FROM category1 WHERE id = ?`;
-
   db.run(sql, [id], function(err) {
     if (err) {
       console.error('Ошибка удаления продукта:', err);
@@ -959,11 +856,6 @@ app.delete('/api/category1/:id', (req, res) => {
   });
 });
 
-
-
-
-
-//для категории 2
 app.get('/api/category2', (req, res) => {
   console.log('Запрос /api/category2 получен');
   db.all('SELECT * FROM category2', (err, rows) => {
@@ -984,15 +876,10 @@ app.get('/api/category2/:id', (req, res) => {
   });
 });
 
-
-
 app.post('/api/category2', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
-
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4(); 
   const sql = `INSERT INTO category2 (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -1000,12 +887,10 @@ app.post('/api/category2', (req, res) => {
       console.error('Ошибка при добавлении в category2:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление продукта
 app.put('/api/category2/:id', (req, res) => {
   const id = req.params.id;
   console.log('PUT /api/category2/:id', id, 'body:', req.body);
@@ -1031,13 +916,9 @@ app.put('/api/category2/:id', (req, res) => {
   });
 });
 
-
-// Удаление продукта
 app.delete('/api/category2/:id', (req, res) => {
   const id = req.params.id;
-
   const sql = `DELETE FROM category2 WHERE id = ?`;
-
   db.run(sql, [id], function(err) {
     if (err) {
       console.error('Ошибка удаления продукта:', err);
@@ -1050,7 +931,6 @@ app.delete('/api/category2/:id', (req, res) => {
   });
 });
 
-//для категории 3
 app.get('/api/category3', (req, res) => {
   console.log('Запрос /api/category3 получен');
   db.all('SELECT * FROM category3', (err, rows) => {
@@ -1071,15 +951,11 @@ app.get('/api/category3/:id', (req, res) => {
   });
 });
 
-
-
 app.post('/api/category3', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
 
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4(); 
   const sql = `INSERT INTO category3 (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -1087,18 +963,14 @@ app.post('/api/category3', (req, res) => {
       console.error('Ошибка при добавлении в category3:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление продукта
 app.put('/api/category3/:id', (req, res) => {
   const id = req.params.id;
   console.log('PUT /api/category3/:id', id, 'body:', req.body);
-
   const { name, description, price, category_id, image_url, stock_quantity } = req.body;
-
   const sql = `
     UPDATE category3
     SET name = ?, description = ?, price = ?, category_id = ?, image_url = ?, stock_quantity = ?
@@ -1118,7 +990,6 @@ app.put('/api/category3/:id', (req, res) => {
   });
 });
 
-// Удаление продукта
 app.delete('/api/category3/:id', (req, res) => {
   const id = req.params.id;
 
@@ -1136,7 +1007,6 @@ app.delete('/api/category3/:id', (req, res) => {
   });
 });
 
-//для категории 4
 app.get('/api/category4', (req, res) => {
   console.log('Запрос /api/category4 получен');
   db.all('SELECT * FROM category4', (err, rows) => {
@@ -1157,15 +1027,10 @@ app.get('/api/category4/:id', (req, res) => {
   });
 });
 
-
-
 app.post('/api/category4', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
-
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4(); 
   const sql = `INSERT INTO category4 (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -1173,12 +1038,10 @@ app.post('/api/category4', (req, res) => {
       console.error('Ошибка при добавлении в category4:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление продукта
 app.put('/api/category4/:id', (req, res) => {
   const id = req.params.id;
   console.log('PUT /api/category4/:id', id, 'body:', req.body);
@@ -1204,11 +1067,8 @@ app.put('/api/category4/:id', (req, res) => {
   });
 });
 
-
-// Удаление продукта
 app.delete('/api/category4/:id', (req, res) => {
   const id = req.params.id;
-
   const sql = `DELETE FROM category4 WHERE id = ?`;
 
   db.run(sql, [id], function(err) {
@@ -1223,7 +1083,6 @@ app.delete('/api/category4/:id', (req, res) => {
   });
 });
 
-//для категории 5
 app.get('/api/category5', (req, res) => {
   console.log('Запрос /api/category5 получен');
   db.all('SELECT * FROM category5', (err, rows) => {
@@ -1244,15 +1103,11 @@ app.get('/api/category5/:id', (req, res) => {
   });
 });
 
-
-
 app.post('/api/category5', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
 
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4(); 
   const sql = `INSERT INTO category5 (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -1260,18 +1115,14 @@ app.post('/api/category5', (req, res) => {
       console.error('Ошибка при добавлении в category5:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление продукта
 app.put('/api/category5/:id', (req, res) => {
   const id = req.params.id;
   console.log('PUT /api/category5/:id', id, 'body:', req.body);
-
   const { name, description, price, category_id, image_url } = req.body;
-
   const sql = `
     UPDATE category5
     SET name = ?, description = ?, price = ?, category_id = ?, image_url = ?
@@ -1291,13 +1142,9 @@ app.put('/api/category5/:id', (req, res) => {
   });
 });
 
-
-// Удаление продукта
 app.delete('/api/category5/:id', (req, res) => {
   const id = req.params.id;
-
   const sql = `DELETE FROM category5 WHERE id = ?`;
-
   db.run(sql, [id], function(err) {
     if (err) {
       console.error('Ошибка удаления продукта:', err);
@@ -1310,7 +1157,6 @@ app.delete('/api/category5/:id', (req, res) => {
   });
 });
 
-//для популярных
 app.get('/api/popular', (req, res) => {
   console.log('Запрос /api/popular получен');
   db.all('SELECT * FROM popular', (err, rows) => {
@@ -1368,7 +1214,6 @@ app.delete('/api/cart/:product_id', authenticateToken, (req, res) => {
     });
 });
 
-
 app.put('/api/popular/:id', (req, res) => {
   const { id } = req.params;
   const { name, description, price, image_url, instagram, whatsapp, website, } = req.body;
@@ -1391,9 +1236,6 @@ app.put('/api/popular/:id', (req, res) => {
   });
 });
 
-
-
-// Получить последние 2 проекта
 app.get('/api/projects/latest', (req, res) => {
   db.all(
     `SELECT * FROM projects ORDER BY ROWID DESC LIMIT 2`,
@@ -1404,16 +1246,10 @@ app.get('/api/projects/latest', (req, res) => {
   );
 });
 
-
-
-
-// Админ: создать продукт
-// Создание продукта (POST /api/admin/products)
 app.post('/api/admin/products', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
   console.log("Данные нового товара:", req.body); 
-  
   const { name, description, price, category_id, image_url, stock_quantity, phone, instagram, whatsapp, subCategoryId } = req.body;
   const id = uuidv4();
 
@@ -1430,21 +1266,15 @@ app.post('/api/admin/products', authenticateToken, (req, res) => {
   );
 });
 
-
-
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-
 app.post('/api/popular', (req, res) => {
   const product = req.body; // данные из тела запроса
   const { name, description, price, category_id, image_url, stock_quantity } = product;
-
-  const id = uuidv4(); // генерируем уникальный ID для продукта
-
-  // SQL запрос с полем stock_quantity, если нет - ставим 0
+  const id = uuidv4();
   const sql = `INSERT INTO popular (id, name, description, price, category_id, image_url, stock_quantity) VALUES (?, ?, ?, ?, ?, ?, ?)`;
 
   db.run(sql, [id, name, description, price, category_id, image_url, stock_quantity ?? 0], function(err) {
@@ -1452,12 +1282,10 @@ app.post('/api/popular', (req, res) => {
       console.error('Ошибка при добавлении в popular:', err);
       return res.status(500).json({ message: 'Ошибка базы данных при добавлении популярного продукта' });
     }
-    // Возвращаем добавленный продукт с id
     res.status(201).json({ id, name, description, price, category_id, image_url, stock_quantity: stock_quantity ?? 0 });
   });
 });
 
-// Обновление популярного продукта
 app.put('/api/admin/products/:id', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
@@ -1489,12 +1317,9 @@ app.put('/api/admin/products/:id', authenticateToken, (req, res) => {
   );
 });
 
-// Удаление популярного продукта
 app.delete('/api/popular/:id', (req, res) => {
   const id = req.params.id;
-
   const sql = `DELETE FROM popular WHERE id = ?`;
-
   db.run(sql, [id], function(err) {
     if (err) {
       console.error('Ошибка удаления популярного продукта:', err);
@@ -1507,8 +1332,6 @@ app.delete('/api/popular/:id', (req, res) => {
   });
 });
 
-
-// Админ: удалить продукт
 app.delete('/api/admin/products/:id', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
@@ -1521,10 +1344,8 @@ app.delete('/api/admin/products/:id', authenticateToken, (req, res) => {
   });
 });
 
-// Админ: обновить проект
 app.put('/api/admin/projects/:id', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
-
   const { id } = req.params;
   const { name, description, image_url } = req.body;
 
@@ -1539,12 +1360,10 @@ app.put('/api/admin/projects/:id', authenticateToken, (req, res) => {
   );
 });
 
-// Админ: удалить проект
 app.delete('/api/admin/projects/:id', authenticateToken, (req, res) => {
   if (req.user.role !== 'admin') return res.status(403).json({ message: 'Доступ запрещен' });
 
   const { id } = req.params;
-
   db.run('DELETE FROM projects WHERE id = ?', [id], function (err) {
     if (err) return res.status(500).json({ message: 'Ошибка при удалении проекта' });
     if (this.changes === 0) return res.status(404).json({ message: 'Проект не найден' });
@@ -1552,10 +1371,8 @@ app.delete('/api/admin/projects/:id', authenticateToken, (req, res) => {
   });
 });
 
-// Получить товары по категории
 app.get("/api/products/category/:categoryName", (req, res) => {
   const categoryName = req.params.categoryName;
-
   const sql = `
     SELECT p.*
     FROM products p
@@ -1581,7 +1398,6 @@ app.post('/api/main-offers/:key', (req, res) => {
   });
 });
 
-// PUT — обновить по ключу
 app.put('/api/main-offers/:key', (req, res) => {
   const { key } = req.params;
   const { text } = req.body;
@@ -1592,7 +1408,6 @@ app.put('/api/main-offers/:key', (req, res) => {
   });
 });
 
-// DELETE — удалить по ключу
 app.delete('/api/main-offers/:key', (req, res) => {
   const { key } = req.params;
   db.run('DELETE FROM main_offer WHERE id = ?', [key], function(err) {
@@ -1601,7 +1416,6 @@ app.delete('/api/main-offers/:key', (req, res) => {
     res.json({ message: 'Deleted' });
   });
 });
- 
 
 app.get('/api/main-offers/:key', (req, res) => {
   const { key } = req.params;
@@ -1612,8 +1426,6 @@ app.get('/api/main-offers/:key', (req, res) => {
   });
 });
 
-
-
 app.get('/api/main-offers', (req, res) => {
   db.all('SELECT id, text FROM main_offer', (err, rows) => {
     if (err) return res.status(500).json({ message: 'Ошибка базы данных' });
@@ -1622,9 +1434,6 @@ app.get('/api/main-offers', (req, res) => {
   
 });
 
-
-
-//для подписок
 app.post('/api/subscribe', (req, res) => {
   console.log('Получен запрос на /api/subscribe с телом:', req.body);
   const { email } = req.body;
@@ -1670,8 +1479,6 @@ app.delete('/api/subscribers/:id', (req, res) => {
   });
 });
 
-
-//для формы обратной связи в контактах 
 app.get('/api/messages', (req, res) => {
   db.all('SELECT * FROM messages ORDER BY created_at DESC', (err, rows) => {
     if (err) return res.status(500).json({ error: 'Ошибка сервера' });
@@ -1688,8 +1495,6 @@ app.delete('/api/messages/:id', (req, res) => {
     res.json({ message: 'Сообщение удалено' });
   });
 });
-
-// server.js или app.js
 
 app.post('/api/messages', (req, res) => {
   const { name, email, subject, message } = req.body;
@@ -1711,8 +1516,6 @@ app.post('/api/messages', (req, res) => {
   });
 });
 
-// ✅ Обработка закрытия БД — отдельно
-// ✅ Обработка закрытия БД
 process.on('SIGINT', () => {
   db.close((err) => {
     if (err) {
@@ -1742,8 +1545,6 @@ app.get('*', (req, res) => {
   }
 });
 
-
-// ✅ Запускаем сервер
 const PORT = process.env.PORT || 3001;
 const server = app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);

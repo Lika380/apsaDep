@@ -48,7 +48,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var react_1 = require("react");
-var iPhone_png_1 = require("../images/iPhone.png");
 var cart_png_1 = require("../../public/cart.png");
 require("../styles/Main.css");
 var MainProjects_1 = require("../components/MainProjects");
@@ -61,21 +60,13 @@ var slides = [
     { img: 'https://i.postimg.cc/MHvMKMkv/Frame_1525.jpgg' },
     { img: 'https://i.postimg.cc/6qg77Wwz/Frame_1524.jpg' }
 ];
-var cards = [
-    { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: 'hgjhg', btnHeart: iPhone_png_1["default"], btnSearch: iPhone_png_1["default"], title: 'Ауадхара', p: "120₽" },
-    { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: iPhone_png_1["default"], btnHeart: iPhone_png_1["default"], btnSearch: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", title: 'Вино "Aчба Иашта"', p: "3400₽" },
-    { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: iPhone_png_1["default"], btnHeart: iPhone_png_1["default"], btnSearch: iPhone_png_1["default"], title: 'MacBook Air ', p: "$65.00 USD" },
-    { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: iPhone_png_1["default"], btnHeart: iPhone_png_1["default"], btnSearch: iPhone_png_1["default"], title: 'Apple Watch Ultra', p: "$65.00 USD" },
-    { img: "https://i.postimg.cc/R0WQLgZ9/Frame-1503.png", btnCart: 'hgjhg', btnHeart: iPhone_png_1["default"], btnSearch: iPhone_png_1["default"], title: 'Apple AirPods Max', p: "$55.00 USD" },
-    { img: "https://i.postimg.cc/qBywFDXv/Frame-1502.png", btnCart: iPhone_png_1["default"], btnHeart: iPhone_png_1["default"], btnSearch: iPhone_png_1["default"], title: 'iPhone 16 ', p: "$65.00 USD" },
-];
 var Main = function () {
     var searchQuery = SearchContext_1.useSearch().searchQuery;
     var sliderRef = react_1.useRef(null);
     var _a = react_1.useState(0), current = _a[0], setCurrent = _a[1];
     var _b = react_1.useState(''), email = _b[0], setEmail = _b[1];
     var _c = react_1.useState(null), subscribeStatus = _c[0], setSubscribeStatus = _c[1];
-    var timeoutRef = react_1.useRef(null); // корректный тип
+    var timeoutRef = react_1.useRef(null);
     var _d = react_1.useState({}), offers = _d[0], setOffers = _d[1];
     var addToCart = CartContext_1.useCart().addToCart;
     var _e = react_1.useState([]), popularCards = _e[0], setPopularCards = _e[1];
@@ -84,22 +75,8 @@ var Main = function () {
     var _h = react_1.useState([]), category3Cards = _h[0], setCategory3Cards = _h[1];
     var _j = react_1.useState([]), category4Cards = _j[0], setCategory4Cards = _j[1];
     var _k = react_1.useState([]), category5Cards = _k[0], setCategory5Cards = _k[1];
-    var filterCards = function (cardsArray) {
-        if (!searchQuery || !searchQuery.trim())
-            return cardsArray;
-        var query = searchQuery.toLowerCase();
-        return cardsArray.filter(function (card) {
-            return card.name.toLowerCase().includes(query) ||
-                (card.description && card.description.toLowerCase().includes(query));
-        });
-    };
     var _l = react_1.useState(false), loading = _l[0], setLoading = _l[1];
     var _m = react_1.useState(null), error = _m[0], setError = _m[1];
-    var _o = react_1.useState([]), bakaleya = _o[0], setBakaleya = _o[1];
-    var _p = react_1.useState([]), milk = _p[0], setMilk = _p[1];
-    var _q = react_1.useState([]), juices = _q[0], setJuices = _q[1];
-    var _r = react_1.useState([]), frozen = _r[0], setFrozen = _r[1];
-    var _s = react_1.useState([]), beauty = _s[0], setBeauty = _s[1];
     var handleSubscribe = function (e) { return __awaiter(void 0, void 0, void 0, function () {
         var response, data, error_1;
         return __generator(this, function (_a) {
@@ -141,7 +118,6 @@ var Main = function () {
             }
         });
     }); };
-    //для категории 1
     react_1.useEffect(function () {
         setLoading(true);
         fetch(config_1.API_BASE_URL + "/api/category1")
@@ -272,7 +248,6 @@ var Main = function () {
             setLoading(false);
         });
     }, []);
-    // СКРОЛЛ СЛАЙДЕРА
     var handleScroll = function () {
         var slider = sliderRef.current;
         if (!slider)

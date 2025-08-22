@@ -3,17 +3,11 @@ import "../styles/footer.css";
 import IG from '../images/IG.png';
 import TG from '../images/tg.png';
 import WA from '../images/WA.png';
-import { AuthPage } from "../components/AuthPage";
-import { UserDropdown } from "../components/UserDropdown";
 import { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
 
 
 const Footer = () => {
-
-  
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
-  const { isAuthenticated } = useAuth();
 
   return (
     <footer className="footer">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { api } from "../utils/api";
 import { useCart } from "./CartContext";
 import { useSearch } from "./SearchContext";
 import "../styles/product.css";
@@ -8,9 +7,6 @@ import { getProducts } from "../utils/api";
 import cartIcon from "../../public/cart.png"
 
 
-
-
-// Объявляем интерфейсы корректно
 interface Product {
   id: string;
   name: string;
@@ -50,8 +46,6 @@ export const ProductList: React.FC<ProductListProps> = ({
   const { addToCart } = useCart();
   const { searchQuery } = useSearch(); // ✅ используешь только его
 
-
-
   const getSubcategoryNameById = (id: string): string => {
     const map: Record<string, string> = {
       "501": "Микроволновки",
@@ -70,8 +64,6 @@ export const ProductList: React.FC<ProductListProps> = ({
     const hasSubcategory = subCategoryId !== undefined && subCategoryId !== null && subCategoryId !== "";
     const hasSearch = searchQuery && searchQuery.trim() !== "";
   
-
-  
     const fetchProducts = async () => {
       try {
         setLoading(true);
@@ -79,7 +71,6 @@ export const ProductList: React.FC<ProductListProps> = ({
   
         const data = await getProducts({ category_id, searchQuery, subCategoryId });
   
-        // 🔵 обогащаем товар
         const enrichedData = data.map((product: any) => ({
           ...product,
           subcategory: getSubcategoryNameById(product.subCategoryId),
@@ -98,10 +89,6 @@ export const ProductList: React.FC<ProductListProps> = ({
   }, [category_id, subCategoryId, searchQuery]);
   
   
-  
-  
-
-  // Фильтрация товаров
   useEffect(() => {
     let filtered = products;
   
@@ -134,73 +121,6 @@ export const ProductList: React.FC<ProductListProps> = ({
     }
   }, [products, selectedCategory, selectedSubcategory, searchQuery, onProductsCountChange]);
   
-  
-  // Проверка "общей" подкатегории
-  const isAllItemsSubcategory = (subCategoryId: string): boolean => {
-    const allItemsSubcategories = [
-      "Все телевизоры",
-      "Все смартфоны",
-      "Все товары",
-      "Смартфоны",
-      "Телевизоры",
-      "Холодильники",
-      "Стиральные машины",
-      "Красота и здоровье",
-      "Планшеты",
-      "Умные часы и браслеты",
-      "Мониторы",
-      "Наушники",
-      "Аксессуары",
-    ];
-    return allItemsSubcategories.includes(subCategoryId);
-  };
-
-  // Ключевые слова для подкатегорий
-  const getSubcategoryKeywords = (subCategoryId: string): string[] => {
-    const keywordMap: { [key: string]: string[] } = {
-      "Все телевизоры": ["телевизор", "тв", "tv"],
-      "12-27 дюймов": ["телевизор", "тв"],
-      "28-38 дюймов": ["телевизор", "тв"],
-      "39-49 дюймов": ["телевизор", "тв"],
-      "50-64 дюйма": ["телевизор", "тв"],
-      "65-74 дюйма": ["телевизор", "тв"],
-      "75+ дюймов": ["телевизор", "тв"],
-      "Smart TV": ["smart", "телевизор", "тв"],
-      "4K Ultra HD": ["4k", "ultra", "hd", "телевизор"],
-      "OLED телевизоры": ["oled", "телевизор"],
-      "QLED телевизоры": ["qled", "телевизор"],
-      iPhone: ["iphone", "айфон"],
-      "Samsung Galaxy": ["samsung", "galaxy"],
-      Xiaomi: ["xiaomi", "ми"],
-      Huawei: ["huawei"],
-      Honor: ["honor"],
-      Холодильники: ["холодильник"],
-      "Двухкамерные холодильники": ["холодильник", "двухкамерный"],
-      "Side-by-Side": ["side-by-side", "холодильник"],
-      "Морозильные камеры": ["морозильник", "морозильная камера"],
-      "Стиральные машины": ["стиральная машина", "стиралка"],
-      "Фронтальные стиральные машины": ["стиральная машина", "фронтальная"],
-      "Вертикальные стиральные машины": ["стиральная машина", "вертикальная"],
-      "Красота и здоровье": ["ноутбук", "laptop"],
-      "Игровые ноутбуки": ["ноутбук", "игровой"],
-      "Ультрабуки": ["ультрабук", "ultrabook"],
-      Планшеты: ["планшет", "tablet"],
-      iPad: ["ipad", "айпад"],
-      Мониторы: ["монитор"],
-      "Игровые мониторы": ["монитор", "игровой"],
-      "4K мониторы": ["монитор", "4k"],
-      Наушники: ["наушники"],
-      "Полноразмерные наушники": ["наушники", "полноразмерные"],
-      "Внутриканальные наушники": ["наушники", "внутриканальные"],
-      "Беспроводные наушники": ["наушники", "беспроводные"],
-      "Умные колонки": ["колонка", "умная", "smart speaker"],
-      "Портативные колонки": ["колонка", "портативная"],
-      "Apple Watch": ["apple watch", "эппл вотч", "умные часы"],
-      Аксессуары: ["аксессуар", "чехол", "кабель", "зарядка"],
-    };
-    return keywordMap[subCategoryId] || [subCategoryId];
-  };
-
   // Сортировка
   const getSortedProducts = () => {
     if (sortOption === "default") {

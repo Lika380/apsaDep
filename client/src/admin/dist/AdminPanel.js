@@ -131,13 +131,11 @@ var AddProductModal = function (_a) {
     }), formData = _c[0], setFormData = _c[1];
     var handleSubmit = function (e) {
         e.preventDefault();
-        // Находим main категорию
         var mainCat = productData_1.productData.find(function (m) { return m.title === formData.mainCategory; });
         if (!mainCat) {
             alert("Выберите основную категорию");
             return;
         }
-        // Находим подкатегорию внутри main
         var subCat = mainCat.items.find(function (i) { return i.title2 === formData.subCategory; });
         if (!subCat) {
             alert("Выберите подкатегорию");
@@ -145,10 +143,8 @@ var AddProductModal = function (_a) {
         }
         var category_id = mainCat.category_id.toString();
         var subCategoryId = subCat.subCategoryId.toString();
-        // Отправляем в onSave все нужные данные, включая subCategoryId
         onSave(__assign(__assign({}, formData), { category_id: category_id, subCategoryId: subCategoryId }));
         onClose();
-        // Очистка формы
         setFormData({
             name: '',
             description: '',
@@ -235,25 +231,6 @@ var EditProductModal = function (_a) {
         mainCategory: "",
         subCategory: ""
     }), formData = _c[0], setFormData = _c[1];
-    var handleSubmit = function (e) {
-        e.preventDefault();
-        var mainCat = productData_1.productData.find(function (m) { return m.title === formData.mainCategory; });
-        if (!mainCat) {
-            alert("Выберите основную категорию");
-            return;
-        }
-        var subCat = mainCat.items.find(function (i) { return i.title2 === formData.subCategory; });
-        if (!subCat) {
-            alert("Выберите подкатегорию");
-            return;
-        }
-        var category_id = mainCat.category_id.toString();
-        var subCategoryId = subCat.subCategoryId.toString();
-        var updatedProduct = __assign(__assign({}, formData), { category_id: category_id,
-            subCategoryId: subCategoryId, id: (product === null || product === void 0 ? void 0 : product.id) || '' });
-        onSave(updatedProduct);
-        onClose();
-    };
     react_1.useEffect(function () {
         if (product) {
             setFormData(__assign(__assign({}, product), { mainCategory: product.mainCategory || "", subCategory: product.subCategory || "" }));
@@ -343,16 +320,13 @@ exports.AdminPanel = function () {
     var _d = react_1.useState(null), error = _d[0], setError = _d[1];
     var _e = react_1.useState(false), showAddProduct = _e[0], setShowAddProduct = _e[1];
     var _f = react_1.useState(null), editingProduct = _f[0], setEditingProduct = _f[1];
-    //для названии блоков с товарами в main.tsx
     var _g = react_1.useState({}), offers = _g[0], setOffers = _g[1];
     var _h = react_1.useState([]), categoryProducts = _h[0], setCategoryProducts = _h[1];
     var _j = react_1.useState(false), loadingCategoryProducts = _j[0], setLoadingCategoryProducts = _j[1];
     var _k = react_1.useState(null), errorCategoryProducts = _k[0], setErrorCategoryProducts = _k[1];
-    //для подписки в разделе [хотите стать спонсором ]
     var _l = react_1.useState([]), subscribers = _l[0], setSubscribers = _l[1];
     var _m = react_1.useState(false), loadingSubscribers = _m[0], setLoadingSubscribers = _m[1];
     var productCategories = tabs.filter(function (tab) { return tab.id.startsWith("category"); });
-    //для формы обратной связи в контактах 
     var _o = react_1.useState([]), messages = _o[0], setMessages = _o[1];
     var _p = react_1.useState(false), loadingMessages = _p[0], setLoadingMessages = _p[1];
     //для названии категории
@@ -412,7 +386,6 @@ exports.AdminPanel = function () {
             }
         });
     }); };
-    //для подписки в разделе [хотите стать спонсором ]
     var loadSubscribers = function () { return __awaiter(void 0, void 0, void 0, function () {
         var res, data, e_3;
         return __generator(this, function (_a) {
@@ -460,7 +433,6 @@ exports.AdminPanel = function () {
                     if (!res.ok) {
                         throw new Error('Ошибка удаления подписчика');
                     }
-                    // После удаления обновляем список подписчиков
                     setSubscribers(function (prev) { return prev.filter(function (sub) { return sub.id !== id; }); });
                     return [3 /*break*/, 3];
                 case 2:

@@ -12,7 +12,6 @@ import { CartProvider } from "./components/CartContext";
 import { SearchProvider } from "./components/SearchContext";
 import { AuthProvider } from "./components/AuthContext";
 import AccommodationPolicy from "./components/information/AccomodationPolicy";
-import Policy from "./components/information/Policy";
 import Contacts from "./pages/Contacts";
 import Projects from "./pages/Projects";
 import InvestorPage from "./pages/InvestorPage";
@@ -36,7 +35,6 @@ function App() {
                   <Route path="/cartPage" element={<CartPage />} />
                   <Route path="/catalog" element={<HomePage />} />
                   <Route path="/privacy" element={<AccommodationPolicy />} />
-                  <Route path="/policy" element={<Policy />} />
                   <Route path="/contacts" element={<Contacts />} />
                   <Route path="/projects" element={<Projects />} />
                   <Route path="/investorPage" element={<InvestorPage />} />
