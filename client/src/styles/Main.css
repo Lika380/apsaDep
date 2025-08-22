@@ -39,7 +39,6 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     width: 90%;
-    height: 100%;
     justify-content: space-between;
     align-items: center;
     margin: 0 auto;
